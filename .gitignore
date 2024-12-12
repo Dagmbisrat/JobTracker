@@ -1,5 +1,8 @@
 #py
 server/__pycache__/
 
+#config
+server/Config.py
+
 MacOS
 .DS_Store
