@@ -1,8 +1,15 @@
 #py
 server/__pycache__/
+server/venv/
+db/venv/
+db/__pycache__/
 
 #config
 server/Config.py
+db/Config.py
 
 MacOS
 .DS_Store
+
+#test
+test/

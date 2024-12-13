@@ -5,6 +5,7 @@ import signal
 import sys
 from email.header import decode_header
 from Config import EMAIL_ADDRESS, PASSWORD
+from Requests import classify_email
 
 def signal_handler(sig, frame):
     """
@@ -12,6 +13,28 @@ def signal_handler(sig, frame):
     """
     print('\nExiting email monitor...')
     sys.exit(0)
+
+def get_email_content(msg):
+    """
+    Extract the email content from the message
+    """
+    content = ""
+    if msg.is_multipart():
+        # Walk through the parts to find the text content
+        for part in msg.walk():
+            if part.get_content_type() == "text/plain":
+                try:
+                    content += part.get_payload(decode=True).decode()
+                except:
+                    pass
+    else:
+        # If the message is not multipart, just get the payload
+        try:
+            content = msg.get_payload(decode=True).decode()
+        except:
+            content = msg.get_payload()
+
+    return content
 
 def connect_to_email(email_address, password, imap_server="imap.gmail.com"):
     """
@@ -50,10 +73,24 @@ def check_for_new_emails(imap):
         if isinstance(from_, bytes):
             from_ = from_.decode()
 
+        # Get content
+        content = get_email_content(email_message)
+
+        #create email structure
+        email_ = f"\nFrom: {from_}\nSubject: {subject}\nContet: {content}"
+
+        ans =  classify_email(email_)
+
         print(f"\nNew email received!")
         print(f"From: {from_}")
         print(f"Subject: {subject}")
         print("-" * 50)
+        print("Content:")
+        print(content)
+        print("=" * 50)
+        print(f"classification: {ans}")
+        print("~" * 50)
+
 
 def monitor_inbox(email_address, password, check_interval=60):
     """
