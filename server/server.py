@@ -4,8 +4,9 @@ import time
 import signal
 import sys
 from email.header import decode_header
-from Config import EMAIL_ADDRESS, PASSWORD
+from Config import DB_API_ADDY, EMAIL_ADDRESS, PASSWORD
 from Requests import classify_email
+import requests
 
 def signal_handler(sig, frame):
     """
@@ -47,6 +48,31 @@ def connect_to_email(email_address, password, imap_server="imap.gmail.com"):
     imap.login(email_address, password)
     return imap
 
+def prosses_Email(email_classifcation):
+    """
+    Process the email to update db if nedded
+    """
+    #Check the type
+    if email_classifcation.type == 1:
+        #enter a new row for the application
+
+        #first create the json
+        application_data = {
+            "email": EMAIL_ADDRESS,
+            "company_name": email_classifcation.company_name,
+            "job_title": email_classifcation.job_title,
+            "status": email_classifcation.status
+        }
+
+        response = requests.post(
+            f'{DB_API_ADDY}/applications',
+            json=application_data
+        )
+
+        #add error checking
+
+
+
 def check_for_new_emails(imap):
     """
     Check inbox for new emails and return their details
@@ -78,18 +104,9 @@ def check_for_new_emails(imap):
 
         #create email structure
         email_ = f"\nFrom: {from_}\nSubject: {subject}\nContet: {content}"
+        answer =  classify_email(email_)
 
-        ans =  classify_email(email_)
-
-        print(f"\nNew email received!")
-        print(f"From: {from_}")
-        print(f"Subject: {subject}")
-        print("-" * 50)
-        print("Content:")
-        print(content)
-        print("=" * 50)
-        print(f"classification: {ans}")
-        print("~" * 50)
+        prosses_Email(answer)
 
 
 def monitor_inbox(email_address, password, check_interval=60):

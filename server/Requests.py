@@ -20,14 +20,13 @@ Here is a description of the parameters:
    - `type`: 1
    - `company_name`: The name of the company mentioned in the email.
    - `job_title`: The title of the job applied for.
-   - `status`: "Pending"
-   - `date`: Today's date in the format DD/MM/YYYY.
+   - `status`: "Pending Response"
 
 2. **Rejection or acceptance of a job application(including potential follow-up communication)**:
    - `type`: 2
    - `company_name`: The name of the company mentioned in the email.
    - `job_title`: The title of the job applied for.
-   - `status`: "Accepted" or "Rejected" based on the email's content.
+   - `status`: "Pending Response" or "Rejected" or "Interview Scheduled" or "Talk Scheduled" or "Offer Received" based on the email's content.
    - `date`: Today's date in the format DD/MM/YYYY.
 
 3. **Neither of the above**:
