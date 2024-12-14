@@ -1,9 +1,10 @@
+#import json
+import requests
 from openai import OpenAI
-from Config import API_KEY
-import json
 from textwrap import dedent
 from pydantic import BaseModel
-from Config import MODEL
+from Config import API_KEY,MODEL,DB_API_ADDY,EMAIL_ADDRESS
+
 
 # init some params
 client = OpenAI(api_key=API_KEY)
@@ -57,3 +58,85 @@ def classify_email(text: str):
     )
 
     return completion.choices[0].message.parsed
+
+#function to process email
+def prosses_Email(email_classification: Email_Classifcation):
+    """
+    Process the email to update db if nedded
+    """
+
+    if email_classification.type not in [1, 2]:
+        print("Email not job specific")
+        return None
+
+    application_data = {
+        "email": EMAIL_ADDRESS,
+        "company_name": email_classification.company_name,
+        "job_title": email_classification.job_title,
+        "status": email_classification.status
+    }
+
+    if email_classification.type == 1:
+        try:
+            response = requests.request(
+                method='POST',
+                url=f'{DB_API_ADDY}/applications',
+                json=application_data
+            )
+            response.raise_for_status()
+            print(f"Email Update successfull: {response.json()}")
+            return response.json()
+
+        except requests.exceptions.ConnectionError:
+            print("Failed to connect to the API. Check if it's running and the URL is correct.")
+            return None
+        except requests.exceptions.HTTPError as e:
+            print(f"API returned an error: {e.response.status_code} - {e.response.text}")
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred while making the request: {str(e)}")
+            return None
+        except ValueError as e:
+            print(f"Failed to parse API response as JSON: {str(e)}")
+            return None
+
+    if email_classification.type == 2:
+        try:
+            response = requests.get(
+                url=f'{DB_API_ADDY}/applications',
+                params={
+                    "email": EMAIL_ADDRESS,
+                    "company_name": email_classification.company_name,
+                    "job_title": email_classification.job_title
+                }
+            )
+            app_id = response.json()  # This gets the app_id from the response
+            print(f'Application id Found: {app_id}')
+
+            # Then update the status
+            update_response = requests.put(
+                url=f'{DB_API_ADDY}/applications/{app_id}',
+                params={'status_update': email_classification.status}
+            )
+            update_response.raise_for_status()
+            print(f"Status updated successfully: {update_response.json()}")
+            return update_response.json()
+
+
+        except requests.exceptions.ConnectionError:
+            print("Failed to connect to the API. Check if it's running and the URL is correct.")
+            return None
+        except requests.exceptions.HTTPError as e:
+            print(f"API returned an error: {e.response.status_code} - {e.response.text}")
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred while making the request: {str(e)}")
+            return None
+        except ValueError as e:
+            print(f"Failed to parse API response as JSON: {str(e)}")
+            return None
+
+        response = requests.put(
+            url=f'{DB_API_ADDY}/applications/{app_id}',
+            params={'status_update': email_classification.status}
+        )
