@@ -1,13 +1,38 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, validator, EmailStr
-from supabase import create_client, Client
-from config import SUPABASE_KEY, SUPABASE_URL
+import bcrypt
 from enum import Enum
 from typing import List
-import bcrypt
+from jose import JWTError, jwt
+from supabase import create_client, Client
+from datetime import datetime, timedelta, UTC
+from pydantic import BaseModel, validator, EmailStr
+from fastapi import FastAPI, HTTPException, Security
+from config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI(title="Job Tracker API")
+
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+security = HTTPBearer()
+
+#acsess token
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)  # Using now(UTC) instead of utcnow()
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security)):
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        email = str(payload["sub"])  # Will raise KeyError if "sub" doesn't exist
+        return email
+    except (JWTError, KeyError):
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 # Create Enum class to match database ENUM
 class ApplicationStatus(str, Enum):
@@ -112,6 +137,12 @@ class UserResponse(BaseModel):
     listening: bool
     email_app_password: str
 
+# Create a new response model for login
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse
+
 #Hash Pass
 def hash_password(password: str) -> str:
     # Generate a salt and hash the password
@@ -194,7 +225,7 @@ async def get_all_users():
         raise HTTPException(status_code=500, detail=str(e))
 
 #get user givin email and pass
-@app.post("/login", response_model=UserResponse)
+@app.post("/login", response_model=LoginResponse)
 async def get_user(user_login: UserLogin):
     try:
         # Fetch user from database by email
@@ -216,13 +247,22 @@ async def get_user(user_login: UserLogin):
         if not verify_password(user_login.password, user['password']):
             raise HTTPException(status_code=401, detail="Invalid password")
 
-        # Return user data without password
-        return UserResponse(
-            name=user['Name'],
-            email=user['email'],
-            listening=user['Listening'],
-            email_app_password=user['email_app_password']
+        # Create access token
+        access_token = create_access_token(
+            data={"sub": user['email']}
         )
+
+        # Return user data without password
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": UserResponse(
+                name=user['Name'],
+                email=user['email'],
+                listening=user['Listening'],
+                email_app_password=user['email_app_password']
+            )
+        }
 
     except HTTPException as he:
         raise he
