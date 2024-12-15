@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, EmailStr
 from supabase import create_client, Client
 from config import SUPABASE_KEY, SUPABASE_URL
 from enum import Enum
+from typing import List
+import bcrypt
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI(title="Job Tracker API")
@@ -80,6 +82,152 @@ async def update_application_status(app_id: int, status_update: ApplicationStatu
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+##-------------Users table endpoints-------------------
+
+class User(BaseModel):
+    name: str
+    email: EmailStr
+    listening: bool
+    email_app_password: str
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    email_app_password: str
+    name: str
+
+    @validator('password')
+    def password_strength(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserResponse(BaseModel):
+    name: str
+    email: EmailStr
+    listening: bool
+    email_app_password: str
+
+#Hash Pass
+def hash_password(password: str) -> str:
+    # Generate a salt and hash the password
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')  # Convert bytes to string for storage
+
+# To verify a Pass
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(
+        plain_password.encode('utf-8'),
+        hashed_password.encode('utf-8')
+    )
+
+#create a user
+@app.post("/signup")
+async def create_user(user: UserCreate):
+    try:
+        # Hash the password before storing
+        hashed_password = hash_password(user.password)
+
+        # Create user data with hashed passwords
+        user_data = {
+            "email": user.email,
+            "password": hashed_password,
+            "email_app_password": user.email_app_password,
+            "Name": user.name,
+            "Listening": True
+        }
+
+        # Insert the user into the database
+        result = supabase.table('users').insert(user_data).execute()
+
+        if result.data:
+            # Return success without exposing hashed passwords
+            return {
+                "message": "User created successfully",
+                "user": {
+                    "email": result.data[0]["email"],
+                    "name": result.data[0]["Name"],
+                    "listening": result.data[0]["Listening"]
+                }
+            }
+        else:
+            raise HTTPException(status_code=400, detail="Failed to create user")
+
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+#get all users
+@app.get("/users", response_model=List[User])
+async def get_all_users():
+    try:
+        # Fetch all users from the database
+        response = supabase.table('users').select(
+            'Name',
+            'email',
+            'Listening',
+            'email_app_password'
+        ).execute()
+
+        if response.data:
+            # Transform the data to match the User model
+            users = [
+                User(
+                    name=user['Name'],
+                    email=user['email'],
+                    listening=user['Listening'],
+                    email_app_password=user['email_app_password']
+                )
+                for user in response.data
+            ]
+            return users
+        else:
+            return []
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+#get user givin email and pass
+@app.post("/login", response_model=UserResponse)
+async def get_user(user_login: UserLogin):
+    try:
+        # Fetch user from database by email
+        response = supabase.table('users').select(
+            'Name',
+            'email',
+            'password',
+            'Listening',
+            'email_app_password'
+        ).eq('email', user_login.email).execute()
+
+        # Check if user exists
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user = response.data[0]
+
+        # Verify password
+        if not verify_password(user_login.password, user['password']):
+            raise HTTPException(status_code=401, detail="Invalid password")
+
+        # Return user data without password
+        return UserResponse(
+            name=user['Name'],
+            email=user['email'],
+            listening=user['Listening'],
+            email_app_password=user['email_app_password']
+        )
+
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
