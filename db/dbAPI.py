@@ -4,14 +4,24 @@ from typing import List
 from jose import JWTError, jwt
 from supabase import create_client, Client
 from datetime import datetime, timedelta, UTC
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, EmailStr
 from fastapi import FastAPI, HTTPException, Security
-from config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY
+from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = FastAPI(title="Job Tracker API")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
