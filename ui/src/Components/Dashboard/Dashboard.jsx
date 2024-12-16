@@ -2,13 +2,18 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DB_API_ADDY } from "../Config.js";
 import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowUpDown } from "lucide-react";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({
+    key: "app_date",
+    direction: "desc",
+  });
+
   const [isDark, setIsDark] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return (
@@ -70,6 +75,46 @@ const Dashboard = () => {
     });
   };
 
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedApplications = [...applications].sort((a, b) => {
+    if (sortConfig.key === "app_date") {
+      const dateA = new Date(a[sortConfig.key]);
+      const dateB = new Date(b[sortConfig.key]);
+      return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
+    }
+
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
+  const getStatusClassName = (status) => {
+    const baseClass = isDark ? "status-badge-dark" : "status-badge-light";
+    return `status-badge ${baseClass} status-${status.toLowerCase().replace(/ /g, "-")}`;
+  };
+
+  const getSortIndicator = (columnKey) => {
+    if (sortConfig.key === columnKey) {
+      return (
+        <span className={`sort-indicator ${sortConfig.direction}`}>
+          <ArrowUpDown size={16} />
+        </span>
+      );
+    }
+    return <ArrowUpDown size={16} className="sort-indicator-inactive" />;
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -77,11 +122,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
-  const getStatusClassName = (status) => {
-    const baseClass = isDark ? "status-badge-dark" : "status-badge-light";
-    return `status-badge ${baseClass} status-${status.toLowerCase().replace(/ /g, "-")}`;
-  };
 
   return (
     <div className="dashboard-container">
@@ -99,21 +139,36 @@ const Dashboard = () => {
             <table className="applications-table">
               <thead>
                 <tr>
-                  <th>Company</th>
-                  <th>Position</th>
+                  <th
+                    onClick={() => handleSort("company_name")}
+                    className="sortable-header"
+                  >
+                    Company {getSortIndicator("company_name")}
+                  </th>
+                  <th
+                    onClick={() => handleSort("job_title")}
+                    className="sortable-header"
+                  >
+                    Position {getSortIndicator("job_title")}
+                  </th>
                   <th>Status</th>
-                  <th>Date Applied</th>
+                  <th
+                    onClick={() => handleSort("app_date")}
+                    className="sortable-header"
+                  >
+                    Date Applied {getSortIndicator("app_date")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {applications.length === 0 ? (
+                {sortedApplications.length === 0 ? (
                   <tr>
                     <td colSpan="4" className="empty-message">
                       No applications found
                     </td>
                   </tr>
                 ) : (
-                  applications.map((app, index) => (
+                  sortedApplications.map((app, index) => (
                     <tr key={index}>
                       <td>{app.company_name}</td>
                       <td>{app.job_title}</td>
