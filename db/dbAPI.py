@@ -4,6 +4,7 @@ from typing import List
 from slowapi import Limiter
 from jose import JWTError, jwt
 from fastapi.middleware import Middleware
+from fastapi.responses import JSONResponse
 from supabase import create_client, Client
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -33,8 +34,8 @@ app.add_middleware(
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-SIGNUP_LIM = 100
-LOGIN_LIM = 3
+SIGNUP_LIM = 12
+LOGIN_LIM = 12
 VERIFY_LIM = 100
 security = HTTPBearer()
 
@@ -71,8 +72,10 @@ class Application(BaseModel):
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return {"error": "Too many requests"}, 429
-
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Too many requests. Please try again later."}
+    )
 
 @app.get("/applications")
 async def get_application_id(email: str, company_name: str, job_title: str):
@@ -184,7 +187,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 #create a user
 @app.post("/signup")
-@limiter.limit(f'${SIGNUP_LIM}/minute')
+@limiter.limit(f'{SIGNUP_LIM}/hour')
 async def create_user(request: Request, user: UserCreate):
     try:
         # Hash the password before storing
@@ -269,7 +272,7 @@ async def get_all_users():
 #get user givin email and pass
 
 @app.post("/login", response_model=LoginResponse)
-@limiter.limit(f'${LOGIN_LIM}/minute')
+@limiter.limit(f'{LOGIN_LIM}/hour')
 async def get_user(request: Request, user_login: UserLogin):
     try:
         # Fetch user from database by email
@@ -316,7 +319,7 @@ async def get_user(request: Request, user_login: UserLogin):
 
 
 @app.get("/verify-token")
-@limiter.limit(f'${VERIFY_LIM}/minute')
+@limiter.limit(f'{VERIFY_LIM}/hour')
 async def verify_token(request: Request, credentials: HTTPAuthorizationCredentials = Security(security)):
     try:
         await get_current_user(credentials)
