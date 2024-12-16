@@ -1,4 +1,5 @@
 import bcrypt
+import imaplib
 from enum import Enum
 from typing import List
 from slowapi import Limiter
@@ -13,8 +14,8 @@ from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, ValidationError
 from fastapi import FastAPI, HTTPException, Security, Request
-from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
 
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -101,7 +102,7 @@ async def get_user_applications(email: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
+#get applications
 @app.get("/applications")
 async def get_application_id(email: str, company_name: str, job_title: str):
     try:
@@ -210,11 +211,34 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         hashed_password.encode('utf-8')
     )
 
+def validate_email_credentials(email, password):
+    """
+    Validate email credentials by attempting to connect to Gmail
+    Returns True if credentials are valid, False otherwise
+    """
+    try:
+        # Try to establish connection
+        imap = imaplib.IMAP4_SSL("imap.gmail.com")
+        imap.login(email, password)
+
+        # If login successful, logout and return True
+        imap.logout()
+        return True
+
+    except imaplib.IMAP4.error:
+        raise HTTPException(status_code=422, detail="Invalid credentials")
+    except Exception:
+        raise HTTPException(status_code=422, detail="Invalid credentials")
+
 #create a user
 @app.post("/signup")
 @limiter.limit(f'{SIGNUP_LIM}/hour')
 async def create_user(request: Request, user: UserCreate):
     try:
+
+        #first check if info is valid
+        validate_email_credentials(user.email,user.email_app_password)
+
         # Hash the password before storing
         hashed_password = hash_password(user.password)
 
