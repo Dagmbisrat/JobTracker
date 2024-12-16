@@ -10,8 +10,8 @@ from slowapi.errors import RateLimitExceeded
 from datetime import datetime, timedelta, UTC
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, validator, EmailStr
-from fastapi import FastAPI, HTTPException, Security, Request
+from pydantic import BaseModel, validator, ValidationError
+from fastapi import FastAPI, HTTPException, Security, Request, status
 from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -137,12 +137,12 @@ async def update_application_status(app_id: int, status_update: ApplicationStatu
 
 class User(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     listening: bool
     email_app_password: str
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     email_app_password: str
     name: str
@@ -150,16 +150,16 @@ class UserCreate(BaseModel):
     @validator('password')
     def password_strength(cls, v):
         if len(v) < 8:
-            raise ValueError('Password must be at least 8 characters long')
+            raise HTTPException(status_code=422, detail="Password must be at least 8 characters long")
         return v
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 class UserResponse(BaseModel):
     name: str
-    email: EmailStr
+    email: str
     listening: bool
 
 # Create a new response model for login
@@ -208,7 +208,6 @@ async def create_user(request: Request, user: UserCreate):
         )
 
         if result.data:
-            print("here")
             # Return success without exposing hashed passwords and with tokens
             return {
                 "access_token": access_token,
@@ -222,9 +221,19 @@ async def create_user(request: Request, user: UserCreate):
         else:
             raise HTTPException(status_code=400, detail="Failed to create user")
 
+
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        error_detail = str(e)
+        error_patterns = {
+            "new row for relation \"users\" violates check constraint": "Invalid name format",
+            "duplicate key value violates unique constraint": "Email Taken",
+        }
+        for pattern, message in error_patterns.items():
+            if pattern in error_detail:
+                raise HTTPException(status_code=422, detail=message)
+
         raise HTTPException(status_code=500, detail=str(e))
 
 #get all users
