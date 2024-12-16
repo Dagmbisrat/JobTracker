@@ -78,10 +78,21 @@
     margin: 0;
 }
 
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .filter-container {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.entries-count {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
 }
 
 .filter-icon {

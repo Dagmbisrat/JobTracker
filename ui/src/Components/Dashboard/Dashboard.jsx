@@ -146,20 +146,27 @@ const Dashboard = () => {
       <div className="dashboard-content">
         <div className="dashboard-card">
           <div className="dashboard-header">
-            <h1 className="dashboard-title">My Applications</h1>
-            <div className="filter-container">
-              <Filter size={16} className="filter-icon" />
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="status-filter"
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
+            <div className="header-top">
+              <h1 className="dashboard-title">My Applications</h1>
+            </div>
+            <div className="filter-section">
+              <div className="filter-container">
+                <Filter size={16} className="filter-icon" />
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="status-filter"
+                >
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="entries-count">
+                {filteredAndSortedApplications.length} entries
+              </div>
             </div>
           </div>
 
