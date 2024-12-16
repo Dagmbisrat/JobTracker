@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, UTC
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, ValidationError
-from fastapi import FastAPI, HTTPException, Security, Request, status
+from fastapi import FastAPI, HTTPException, Security, Request
 from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -70,12 +70,37 @@ class Application(BaseModel):
     job_title: str
     status: ApplicationStatus = ApplicationStatus.PENDING_RESPONSE
 
+class ApplicationResponse(BaseModel):
+    company_name: str
+    job_title: str
+    status: ApplicationStatus
+    app_date: datetime
+
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
         status_code=429,
         content={"detail": "Too many requests. Please try again later."}
     )
+
+#get All aps of user
+@app.get("/applications/user/{email}", response_model=List[ApplicationResponse])
+async def get_user_applications(email: str):
+    try:
+        response = supabase.table('applications')\
+            .select("company_name,job_title,status,app_date")\
+            .eq("email", email)\
+            .order("app_date", desc=True)\
+            .execute()
+
+        if not response.data:
+            return []
+
+        return response.data
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.get("/applications")
 async def get_application_id(email: str, company_name: str, job_title: str):
@@ -286,13 +311,13 @@ async def get_user(request: Request, user_login: UserLogin):
 
         # Check if user exists
         if not response.data:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=404, detail="Invalid password or Email")
 
         user = response.data[0]
 
         # Verify password
         if not verify_password(user_login.password, user['password']):
-            raise HTTPException(status_code=401, detail="Invalid password")
+            raise HTTPException(status_code=401, detail="Invalid password or Email")
 
         # Create access token
         access_token = create_access_token(

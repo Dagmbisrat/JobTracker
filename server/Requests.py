@@ -66,6 +66,8 @@ def prosses_Email(email_classification: Email_Classifcation):
     """
 
     if email_classification.type not in [1, 2]:
+        #find a way to mark the email as unread----
+
         print("Email not job specific")
         return None
 

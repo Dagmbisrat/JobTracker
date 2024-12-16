@@ -92,7 +92,7 @@ def monitor_inbox(email_address, password, check_interval=60):
 
     try:
         imap = connect_to_email(email_address, password)
-        print(f"Connected to email server. Monitoring for new emails...")
+        print("Connected to email server. Monitoring for new emails...")
 
         while True:
             check_for_new_emails(imap)
