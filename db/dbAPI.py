@@ -1,18 +1,26 @@
 import bcrypt
 from enum import Enum
 from typing import List
+from slowapi import Limiter
 from jose import JWTError, jwt
+from fastapi.middleware import Middleware
 from supabase import create_client, Client
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from datetime import datetime, timedelta, UTC
+from slowapi.middleware import SlowAPIMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, EmailStr
-from fastapi import FastAPI, HTTPException, Security
+from fastapi import FastAPI, HTTPException, Security, Request
 from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="Job Tracker API")
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
 
 # Add CORS middleware
 app.add_middleware(
@@ -25,6 +33,9 @@ app.add_middleware(
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SIGNUP_LIM = 100
+LOGIN_LIM = 3
+VERIFY_LIM = 100
 security = HTTPBearer()
 
 #acsess token
@@ -57,6 +68,11 @@ class Application(BaseModel):
     company_name: str
     job_title: str
     status: ApplicationStatus = ApplicationStatus.PENDING_RESPONSE
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return {"error": "Too many requests"}, 429
+
 
 @app.get("/applications")
 async def get_application_id(email: str, company_name: str, job_title: str):
@@ -145,7 +161,6 @@ class UserResponse(BaseModel):
     name: str
     email: EmailStr
     listening: bool
-    email_app_password: str
 
 # Create a new response model for login
 class LoginResponse(BaseModel):
@@ -169,7 +184,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 #create a user
 @app.post("/signup")
-async def create_user(user: UserCreate):
+@limiter.limit(f'${SIGNUP_LIM}/minute')
+async def create_user(request: Request, user: UserCreate):
     try:
         # Hash the password before storing
         hashed_password = hash_password(user.password)
@@ -186,15 +202,22 @@ async def create_user(user: UserCreate):
         # Insert the user into the database
         result = supabase.table('users').insert(user_data).execute()
 
+        # Create access token
+        access_token = create_access_token(
+            data={"sub": user.email}
+        )
+
         if result.data:
-            # Return success without exposing hashed passwords
+            print("here")
+            # Return success without exposing hashed passwords and with tokens
             return {
-                "message": "User created successfully",
-                "user": {
-                    "email": result.data[0]["email"],
-                    "name": result.data[0]["Name"],
-                    "listening": result.data[0]["Listening"]
-                }
+                "access_token": access_token,
+                "token_type": "bearer",
+                "user": UserResponse(
+                    name= user.name,
+                    email= user.email,
+                    listening= True
+                )
             }
         else:
             raise HTTPException(status_code=400, detail="Failed to create user")
@@ -235,8 +258,10 @@ async def get_all_users():
         raise HTTPException(status_code=500, detail=str(e))
 
 #get user givin email and pass
+
 @app.post("/login", response_model=LoginResponse)
-async def get_user(user_login: UserLogin):
+@limiter.limit(f'${LOGIN_LIM}/minute')
+async def get_user(request: Request, user_login: UserLogin):
     try:
         # Fetch user from database by email
         response = supabase.table('users').select(
@@ -270,7 +295,6 @@ async def get_user(user_login: UserLogin):
                 name=user['Name'],
                 email=user['email'],
                 listening=user['Listening'],
-                email_app_password=user['email_app_password']
             )
         }
 
@@ -279,6 +303,17 @@ async def get_user(user_login: UserLogin):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+#----------------------Others-------------------------
+
+
+@app.get("/verify-token")
+@limiter.limit(f'${VERIFY_LIM}/minute')
+async def verify_token(request: Request, credentials: HTTPAuthorizationCredentials = Security(security)):
+    try:
+        await get_current_user(credentials)
+        return {"valid": True}
+    except HTTPException:
+        return {"valid": False}
 
 if __name__ == "__main__":
     import uvicorn

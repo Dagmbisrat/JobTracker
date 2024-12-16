@@ -12,4 +12,4 @@ MacOS
 .DS_Store
 
 #test
-test/
+vtest/
