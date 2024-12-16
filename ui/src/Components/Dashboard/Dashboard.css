@@ -26,9 +26,20 @@
 
 .theme-toggle-container {
     position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 100;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.theme-toggle-container:hover {
+    opacity: 1;
 }
 
 .dashboard-content {
@@ -46,14 +57,63 @@
 }
 
 .dashboard-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--border-color);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .dashboard-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-primary);
+    margin: 0;
+}
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-icon {
+    color: var(--text-secondary);
+}
+
+.status-filter {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 150px;
+}
+
+.status-filter:hover {
+    border-color: var(--text-secondary);
+}
+
+.status-filter:focus {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.status-filter option {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    padding: 0.5rem;
 }
 
 .table-container {
@@ -185,11 +245,22 @@
 
 @media (max-width: 640px) {
     .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
         padding: 1rem;
     }
 
     .dashboard-title {
         font-size: 1.25rem;
+    }
+
+    .filter-container {
+        width: 100%;
+    }
+
+    .status-filter {
+        flex-grow: 1;
     }
 
     .applications-table th,
@@ -200,5 +271,10 @@
     .status-badge {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
+    }
+
+    .theme-toggle-container {
+        bottom: 1rem;
+        left: 1rem;
     }
 }

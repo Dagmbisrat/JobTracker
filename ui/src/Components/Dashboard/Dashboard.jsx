@@ -2,17 +2,27 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DB_API_ADDY } from "../Config.js";
 import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
-import { Loader2, ArrowUpDown } from "lucide-react";
+import { Loader2, ArrowUpDown, Filter } from "lucide-react";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState("All");
   const [sortConfig, setSortConfig] = useState({
     key: "app_date",
     direction: "desc",
   });
+
+  const statusOptions = [
+    "All",
+    "Pending Response",
+    "Interview Scheduled",
+    "Talk Scheduled",
+    "Offer Received",
+    "Rejected",
+  ];
 
   const [isDark, setIsDark] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -83,21 +93,25 @@ const Dashboard = () => {
     setSortConfig({ key, direction });
   };
 
-  const sortedApplications = [...applications].sort((a, b) => {
-    if (sortConfig.key === "app_date") {
-      const dateA = new Date(a[sortConfig.key]);
-      const dateB = new Date(b[sortConfig.key]);
-      return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
-    }
+  const filteredAndSortedApplications = [...applications]
+    .filter((app) =>
+      selectedStatus === "All" ? true : app.status === selectedStatus,
+    )
+    .sort((a, b) => {
+      if (sortConfig.key === "app_date") {
+        const dateA = new Date(a[sortConfig.key]);
+        const dateB = new Date(b[sortConfig.key]);
+        return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
+      }
 
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === "asc" ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === "asc" ? 1 : -1;
-    }
-    return 0;
-  });
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
 
   const getStatusClassName = (status) => {
     const baseClass = isDark ? "status-badge-dark" : "status-badge-light";
@@ -133,6 +147,20 @@ const Dashboard = () => {
         <div className="dashboard-card">
           <div className="dashboard-header">
             <h1 className="dashboard-title">My Applications</h1>
+            <div className="filter-container">
+              <Filter size={16} className="filter-icon" />
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="status-filter"
+              >
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="table-container">
@@ -161,14 +189,14 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {sortedApplications.length === 0 ? (
+                {filteredAndSortedApplications.length === 0 ? (
                   <tr>
                     <td colSpan="4" className="empty-message">
                       No applications found
                     </td>
                   </tr>
                 ) : (
-                  sortedApplications.map((app, index) => (
+                  filteredAndSortedApplications.map((app, index) => (
                     <tr key={index}>
                       <td>{app.company_name}</td>
                       <td>{app.job_title}</td>
