@@ -4,9 +4,10 @@ server/venv/
 db/venv/
 db/__pycache__/
 
-#config
-server/Config.py
-db/Config.py
+#env
+server/.env
+db/.env
+ui/.env
 
 MacOS
 .DS_Store

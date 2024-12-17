@@ -1,10 +1,19 @@
-#import json
+import os
 import requests
 from openai import OpenAI
 from textwrap import dedent
+from dotenv import load_dotenv
 from pydantic import BaseModel
-from Config import API_KEY,MODEL,DB_API_ADDY,EMAIL_ADDRESS
 
+load_dotenv()
+
+# Get environment variables
+API_KEY = os.getenv('API_KEY')
+DB_API_ADDY = os.getenv('DB_API_ADDY')
+MODEL = os.getenv('MODEL')
+
+if not all([API_KEY, DB_API_ADDY,MODEL]):
+    raise ValueError("Missing required environment variables. Please check your .env file.")
 
 # init some params
 client = OpenAI(api_key=API_KEY)
@@ -60,7 +69,7 @@ def classify_email(text: str):
     return completion.choices[0].message.parsed
 
 #function to process email
-def prosses_Email(email_classification: Email_Classifcation):
+def prosses_Email(email_classification: Email_Classifcation, email: str):
     """
     Process the email to update db if nedded
     """
@@ -71,8 +80,9 @@ def prosses_Email(email_classification: Email_Classifcation):
         print("Email not job specific")
         return None
 
+    #create the data to update the db for user(:email)
     application_data = {
-        "email": EMAIL_ADDRESS,
+        "email": email,
         "company_name": email_classification.company_name,
         "job_title": email_classification.job_title,
         "status": email_classification.status
@@ -107,7 +117,7 @@ def prosses_Email(email_classification: Email_Classifcation):
             response = requests.get(
                 url=f'{DB_API_ADDY}/applications',
                 params={
-                    "email": EMAIL_ADDRESS,
+                    "email": email,
                     "company_name": email_classification.company_name,
                     "job_title": email_classification.job_title
                 }

@@ -1,13 +1,22 @@
-import imaplib
-import email
-import time
-import signal
+import os
 import sys
-import requests
+import time
+import email
+import signal
+import imaplib
 import logging
+import requests
+from dotenv import load_dotenv
 from email.header import decode_header
-from Config import DB_API_ADDY
 from Requests import classify_email, prosses_Email
+
+
+load_dotenv()
+# Get environment variables prosses_Email
+DB_API_ADDY = os.getenv('DB_API_ADDY')
+
+if not DB_API_ADDY:
+    raise ValueError("Missing required environment variables. Please check your .env file.")
 
 # Set up logging
 logging.basicConfig(
@@ -56,7 +65,7 @@ def connect_to_email(email_address, password, imap_server="imap.gmail.com"):
         logger.error(f"Unexpected error connecting to email: {str(e)}")
         raise
 
-def check_for_new_emails(imap):
+def check_for_new_emails(imap,email_address):
     """Check inbox for new emails and process them"""
     try:
         # Select the mailbox you want to check
@@ -88,7 +97,7 @@ def check_for_new_emails(imap):
                 # Create email structure and process
                 email_ = f"\nFrom: {from_}\nSubject: {subject}\nContent: {content}"
                 answer = classify_email(email_)
-                prosses_Email(answer)
+                prosses_Email(answer,email_address)
 
             except Exception as e:
                 logger.error(f"Error processing email {num}: {str(e)}")
@@ -104,7 +113,7 @@ def check_inbox(email_address, password):
     try:
         imap = connect_to_email(email_address, password)
         logger.info(f'Connected to {email_address}\'s email server. Checking for new emails...')
-        check_for_new_emails(imap)
+        check_for_new_emails(imap,email_address)
         return True
     except Exception as e:
         logger.error(f"Error checking inbox for {email_address}: {str(e)}")

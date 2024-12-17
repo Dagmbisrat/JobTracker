@@ -1,1 +1,1 @@
-export const DB_API_ADDY = "http://localhost:8000";
+export const DB_API_ADDY = import.meta.env.VITE_DB_API_ADDY;

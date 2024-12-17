@@ -1,8 +1,10 @@
+import os
 import bcrypt
 import imaplib
 from enum import Enum
 from typing import List
 from slowapi import Limiter
+from dotenv import load_dotenv
 from jose import JWTError, jwt
 from fastapi.middleware import Middleware
 from fastapi.responses import JSONResponse
@@ -15,8 +17,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, ValidationError
 from fastapi import FastAPI, HTTPException, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
+#from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
+load_dotenv()
 
+# Get environment variables
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+FRONTEND_URL = os.getenv('FRONTEND_URL')
+
+#env validation
+if not all([SUPABASE_URL, SUPABASE_KEY, JWT_SECRET_KEY, FRONTEND_URL]):
+    raise ValueError("Missing required environment variables. Please check your .env file.")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 limiter = Limiter(key_func=get_remote_address)
