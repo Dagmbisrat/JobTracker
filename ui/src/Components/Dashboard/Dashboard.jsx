@@ -43,7 +43,7 @@ const Dashboard = () => {
       const user = JSON.parse(localStorage.getItem("user"));
 
       if (!token || !user) {
-        navigate("/login");
+        navigate("/");
         return;
       }
 

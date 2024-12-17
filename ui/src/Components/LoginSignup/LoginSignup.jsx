@@ -42,7 +42,7 @@ const AuthComponent = () => {
 
     //check if tokens exist
     if (!token || !user) {
-      navigate("/login");
+      navigate("/");
       return;
     }
 
@@ -61,7 +61,7 @@ const AuthComponent = () => {
           // Token is invalid or expired
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          navigate("/login");
+          navigate("/");
         } else {
           //go to dash if alredy loogedin
           navigate("/dashboard");
@@ -71,7 +71,7 @@ const AuthComponent = () => {
         console.error("Token verification failed:", error);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        navigate("/login");
+        navigate("/");
       }
     };
 
