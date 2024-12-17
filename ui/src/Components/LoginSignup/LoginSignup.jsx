@@ -53,8 +53,13 @@ const AuthComponent = () => {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
+        if (!response.ok) {
+          throw new Error("Token verification failed");
+        }
+
         const data = await response.json();
 
         if (!data.valid) {
@@ -68,9 +73,10 @@ const AuthComponent = () => {
         }
       } catch (error) {
         // Handle network errors or other issues
+
         console.error("Token verification failed:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        //localStorage.removeItem("token");
+        //localStorage.removeItem("user");
         navigate("/");
       }
     };
