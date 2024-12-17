@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, ValidationError
 from fastapi import FastAPI, HTTPException, Security, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-#from Config import SUPABASE_KEY, SUPABASE_URL, JWT_SECRET_KEY, FRONTEND_URL
+
 load_dotenv()
 
 # Get environment variables
