@@ -215,6 +215,12 @@
     animation: spin 1s linear infinite;
 }
 
+.password-error {
+    color: var(--error-text);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
 @keyframes spin {
     from {
         transform: rotate(0deg);

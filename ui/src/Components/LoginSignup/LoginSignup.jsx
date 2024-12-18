@@ -21,6 +21,7 @@ const AuthComponent = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [isDark, setIsDark] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return (
@@ -32,22 +33,20 @@ const AuthComponent = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    verifyPassword: "",
     name: "",
     email_app_password: "",
   });
 
-  //Check for existing login on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
 
-    //check if tokens exist
     if (!token || !user) {
       navigate("/");
       return;
     }
 
-    // Verify token with backend
     const verifyToken = async () => {
       try {
         const response = await fetch(`${DB_API_ADDY}/verify-token`, {
@@ -64,17 +63,13 @@ const AuthComponent = () => {
         const data = await response.json();
 
         if (!data.valid) {
-          // Token is invalid or expired
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           navigate("/");
         } else {
-          //go to dash if alredy loogedin
           navigate("/dashboard");
         }
       } catch (error) {
-        // Handle network errors or other issues
-
         console.error("Token verification failed:", error);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -94,32 +89,57 @@ const AuthComponent = () => {
     setIsDark(!isDark);
   };
 
+  const validatePasswords = () => {
+    if (!isLogin && formData.password !== formData.verifyPassword) {
+      setPasswordError("Passwords do not match");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isLogin && !validatePasswords()) {
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
       const endpoint = isLogin ? "/login" : "/signup";
+      const { verifyPassword, ...submitData } = formData;
+
       const response = await fetch(`${DB_API_ADDY}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || "An error occurred");
+        // Extract only the message text without error codes
+        let errorMessage = data.detail || "An error occurred";
+        if (typeof errorMessage === "string") {
+          // Remove any error codes that might be in parentheses or brackets
+          errorMessage = errorMessage.replace(/[\[\(].*?[\]\)]/g, "").trim();
+          // Remove any leading error code patterns (e.g., "E123:", "Error 123:")
+          errorMessage = errorMessage.replace(
+            /^([Ee]rror\s*\d+:?\s*)|(\d+:?\s*)/i,
+            "",
+          );
+        }
+        throw new Error(errorMessage);
       }
 
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/dashboard");
-
-      //console.log("Success:", data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -128,7 +148,12 @@ const AuthComponent = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "password" || name === "verifyPassword") {
+      setPasswordError("");
+    }
   };
 
   return (
@@ -190,17 +215,34 @@ const AuthComponent = () => {
             </div>
 
             {!isLogin && (
-              <div className="form-group">
-                <label>Email App Password</label>
-                <Input
-                  name="email_app_password"
-                  type="password"
-                  value={formData.email_app_password}
-                  onChange={handleChange}
-                  placeholder="Your email app password"
-                  required
-                />
-              </div>
+              <>
+                <div className="form-group">
+                  <label>Verify Password</label>
+                  <Input
+                    name="verifyPassword"
+                    type="password"
+                    value={formData.verifyPassword}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    required
+                  />
+                  {passwordError && (
+                    <span className="password-error">{passwordError}</span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label>Email App Password</label>
+                  <Input
+                    name="email_app_password"
+                    type="password"
+                    value={formData.email_app_password}
+                    onChange={handleChange}
+                    placeholder="Your email app password"
+                    required
+                  />
+                </div>
+              </>
             )}
 
             <Button
@@ -225,9 +267,11 @@ const AuthComponent = () => {
             onClick={() => {
               setIsLogin(!isLogin);
               setError("");
+              setPasswordError("");
               setFormData({
                 email: "",
                 password: "",
+                verifyPassword: "",
                 name: "",
                 email_app_password: "",
               });
