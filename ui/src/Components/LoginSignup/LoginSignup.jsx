@@ -49,34 +49,51 @@ const AuthComponent = () => {
     // Verify token with backend
     const verifyToken = async () => {
       try {
-        const response = await fetch(`${DB_API_ADDY}/verify-token`, {
+        console.log("Starting token verification with token:", token); // Log token being sent
+        const apiUrl = `${DB_API_ADDY}/verify-token`;
+        console.log("Making request to:", apiUrl); // Log full URL
+
+        const response = await fetch(apiUrl, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
+            // Add these headers to prevent caching
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache"
           },
         });
-        if (!response.ok) {
-          throw new Error("Token verification failed");
+
+        console.log("Response status:", response.status); // Log response status
+
+        // Log raw response body
+        const rawText = await response.text();
+        console.log("Raw response:", rawText);
+
+        // Try to parse as JSON
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch (e) {
+          console.error("JSON parsing failed:", e);
+          console.log("Received non-JSON response:", rawText);
+          throw new Error("Invalid JSON response");
         }
 
-        const data = await response.json();
-
         if (!data.valid) {
-          // Token is invalid or expired
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           navigate("/");
         } else {
-          //go to dash if alredy loogedin
           navigate("/dashboard");
         }
       } catch (error) {
-        // Handle network errors or other issues
-
         console.error("Token verification failed:", error);
-        //localStorage.removeItem("token");
-        //localStorage.removeItem("user");
+        // Optionally log the error details
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack
+        });
         navigate("/");
       }
     };
