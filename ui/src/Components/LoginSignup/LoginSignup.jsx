@@ -112,6 +112,9 @@ const AuthComponent = () => {
       const endpoint = isLogin ? "/login" : "/signup";
       const { verifyPassword, ...submitData } = formData;
 
+      // Convert email to lowercase before sending
+      submitData.email = submitData.email.toLowerCase();
+
       const response = await fetch(`${DB_API_ADDY}${endpoint}`, {
         method: "POST",
         headers: {
