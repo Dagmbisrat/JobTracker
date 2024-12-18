@@ -26,13 +26,21 @@ const Footer = ({ isDark, toggleDark }) => {
         </div>
         <div className="footer-right">
           <div className="footer-social">
-            <a href="#" className="social-icon" aria-label="GitHub">
+            <a
+              href="https://github.com/Dagmbisrat"
+              className="social-icon"
+              aria-label="GitHub"
+            >
               <Github size={20} />
             </a>
-            <a href="#" className="social-icon" aria-label="Twitter">
+            {/* <a href="#" className="social-icon" aria-label="Twitter">
               <Twitter size={20} />
-            </a>
-            <a href="#" className="social-icon" aria-label="LinkedIn">
+            </a> */}
+            <a
+              href="https://www.linkedin.com/in/dagm-bisrat-482aa9250/"
+              className="social-icon"
+              aria-label="LinkedIn"
+            >
               <Linkedin size={20} />
             </a>
             <button

@@ -1,6 +1,7 @@
 import Dashboard from "./Components/Dashboard/Dashboard.jsx";
 import AuthComponent from "./Components/LoginSignup/LoginSignup.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./Components/Theme.css";
 
 function App() {
   return (

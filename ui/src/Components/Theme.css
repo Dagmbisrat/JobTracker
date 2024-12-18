@@ -1,0 +1,66 @@
+:root {
+    /* Light theme defaults */
+    --background: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border-color: #d1d5db;
+    --input-focus: #2563eb;
+    --button-bg: #2563eb;
+    --button-hover: #1d4ed8;
+    --button-disabled: #93c5fd;
+    --hover-bg: #f9fafb;
+
+    /* Status colors - Light mode */
+    --status-pending: #fef3c7;
+    --status-pending-text: #78350f;
+    --status-rejected: #fee2e2;
+    --status-rejected-text: #991b1b;
+    --status-interview: #dbeafe;
+    --status-interview-text: #1e3a8a;
+    --status-talk: #e0e7ff;
+    --status-talk-text: #312e81;
+    --status-offer: #d1fae5;
+    --status-offer-text: #064e3b;
+
+    /* Error states - Light mode */
+    --error-bg: #fee2e2;
+    --error-border: #fecaca;
+    --error-text: #dc2626;
+}
+
+/* Dark theme overrides */
+.dark {
+    /* Darker backgrounds */
+    --background: #0f172a; /* Darker blue-gray background */
+    --card-bg: #1e293b; /* Darker card background */
+    --hover-bg: #334155; /* Lighter hover state for contrast */
+
+    /* Brighter text for better contrast */
+    --text-primary: #f8fafc; /* Brighter white text */
+    --text-secondary: #e2e8f0; /* Lighter secondary text */
+    --border-color: #475569; /* More visible borders */
+
+    /* More vibrant interactive elements */
+    --input-focus: #4f46e5; /* More vibrant indigo */
+    --button-bg: #4f46e5; /* Matching indigo */
+    --button-hover: #6366f1; /* Brighter hover state */
+    --button-disabled: #818cf8; /* Lighter disabled state */
+
+    /* Status colors - Enhanced for dark mode */
+    --status-pending: #854d0e; /* Darker amber */
+    --status-pending-text: #fef3c7;
+    --status-rejected: #be123c; /* Deeper red */
+    --status-rejected-text: #fecdd3;
+    --status-interview: #1e40af; /* Richer blue */
+    --status-interview-text: #dbeafe;
+    --status-talk: #3730a3; /* Deeper indigo */
+    --status-talk-text: #e0e7ff;
+    --status-offer: #047857; /* Deeper green */
+    --status-offer-text: #d1fae5;
+
+    /* Error states - Enhanced contrast */
+    --error-bg: #991b1b; /* Deeper red background */
+    --error-border: #dc2626; /* Brighter red border */
+    --error-text: #fecaca; /* Lighter error text */
+}
