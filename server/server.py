@@ -168,6 +168,8 @@ def monitor_inbox(check_interval=60):
                     time.sleep(300)  # Wait 5 minutes
                     consecutive_failures = 0
 
+            logger.info("Done scanning all users unread emails")
+
             # Calculate sleep time
             end = time.time()
             diff = end - start
