@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { AlertCircle, Loader2, Moon, Sun } from "lucide-react";
 import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
+import InfoButton from "../InfoButton/InfoButton.jsx";
 
 const Button = ({ children, ...props }) => (
   <button {...props} className={`button ${props.className || ""}`}>
@@ -239,6 +240,7 @@ const AuthComponent = () => {
           </button>
         </div>
       </div>
+      {!isLogin && <InfoButton />}
     </div>
   );
 };
