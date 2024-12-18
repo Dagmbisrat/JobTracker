@@ -59,6 +59,13 @@ const Dashboard = () => {
         );
 
         if (!response.ok) {
+          // If response is unauthorized (401) or forbidden (403), redirect to login
+          if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            navigate("/");
+            return;
+          }
           throw new Error("Failed to fetch applications");
         }
 
@@ -66,6 +73,15 @@ const Dashboard = () => {
         setApplications(data);
       } catch (error) {
         console.error("Error fetching applications:", error);
+        // On any error that might indicate invalid authentication, redirect to login
+        if (
+          error.message.includes("unauthorized") ||
+          error.message.includes("forbidden")
+        ) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          navigate("/");
+        }
       } finally {
         setLoading(false);
       }
