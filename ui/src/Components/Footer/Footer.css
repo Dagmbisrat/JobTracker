@@ -1,0 +1,119 @@
+.dashboard-footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+    color: var(--text-secondary);
+    transition: background-color 0.3s ease;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--text-primary);
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.social-icon {
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.social-icon:hover {
+    color: var(--text-primary);
+}
+
+.footer-copyright {
+    font-size: 0.875rem;
+}
+
+.footer-theme-toggle {
+    padding: 0.5rem;
+    border-radius: 9999px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1rem;
+}
+
+.footer-theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.footer-theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.footer-theme-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--text-primary);
+    transition: color 0.2s ease;
+}
+
+@media (max-width: 640px) {
+    .dashboard-footer {
+        padding: 1rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .footer-left,
+    .footer-right {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .footer-social {
+        justify-content: center;
+    }
+
+    .footer-theme-toggle {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}

@@ -29,10 +29,3 @@
     color: var(--text-primary);
     transition: color 0.2s ease;
 }
-
-@media (max-width: 640px) {
-    .theme-toggle {
-        top: 1rem;
-        right: 1rem;
-    }
-}

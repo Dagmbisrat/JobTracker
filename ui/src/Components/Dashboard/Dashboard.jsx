@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DB_API_ADDY } from "../Config.js";
 import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
-import { Loader2, ArrowUpDown, Filter } from "lucide-react";
+import { Loader2, ArrowUpDown, Filter, LogOut } from "lucide-react";
 import "./Dashboard.css";
+import Footer from "../Footer/Footer.jsx";
+import StatusIndicator from "../StatusIndicator/StatusIndicator.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -94,6 +96,12 @@ const Dashboard = () => {
     setIsDark(!isDark);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -132,7 +140,9 @@ const Dashboard = () => {
 
   const getStatusClassName = (status) => {
     const baseClass = isDark ? "status-badge-dark" : "status-badge-light";
-    return `status-badge ${baseClass} status-${status.toLowerCase().replace(/ /g, "-")}`;
+    return `status-badge ${baseClass} status-${status
+      .toLowerCase()
+      .replace(/ /g, "-")}`;
   };
 
   const getSortIndicator = (columnKey) => {
@@ -156,15 +166,24 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <div className="theme-toggle-container">
-        <DarkModeToggle isDark={isDark} toggleDark={toggleDark} />
-      </div>
-
       <div className="dashboard-content">
         <div className="dashboard-card">
           <div className="dashboard-header">
             <div className="header-top">
               <h1 className="dashboard-title">My Applications</h1>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+              >
+                <StatusIndicator
+                  isListening={
+                    JSON.parse(localStorage.getItem("user")).listening
+                  }
+                />
+                <button onClick={handleLogout} className="logout-button">
+                  <LogOut size={16} className="logout-icon" />
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
             <div className="filter-section">
               <div className="filter-container">
@@ -238,6 +257,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      <Footer isDark={isDark} toggleDark={toggleDark} />
     </div>
   );
 };
