@@ -36,7 +36,7 @@ def get_email_content(msg):
     if msg.is_multipart():
         # Walk through the parts to find the text content
         for part in msg.walk():
-            if part.get_content_type() == "text/plain":
+            if part.get_content_type() in ["text/plain", "text/html"]:
                 try:
                     content += part.get_payload(decode=True).decode()
                 except Exception as e:
