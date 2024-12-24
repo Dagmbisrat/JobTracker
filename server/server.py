@@ -93,9 +93,11 @@ def check_for_new_emails(imap,email_address):
 
                 # Get content
                 content = get_email_content(email_message)
+                #print(content)
 
                 # Create email structure and process
                 email_ = f"\nFrom: {from_}\nSubject: {subject}\nContent: {content}"
+                #print(email_)
                 answer = classify_email(email_)
                 prosses_Email(answer,email_address)
 

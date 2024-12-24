@@ -34,7 +34,7 @@ Here is a description of the parameters:
 
 2. **Rejection or acceptance of a job application(including potential follow-up communication)**:
    - `type`: 2
-   - `company_name`: The name of the company mentioned in the email.
+   - `company_name`: The name of the company the email is from (no always from the email address its from).
    - `job_title`: The title of the job applied for (make shure this exsists).
    - `status`: "Pending Response" or "Rejected" or "Interview Scheduled" or "Talk Scheduled" or "Offer Received" based on the email's content.
    - `date`: Today's date in the format DD/MM/YYYY.
@@ -58,7 +58,7 @@ class Email_Classifcation(BaseModel):
 def classify_email(text: str):
     completion = client.beta.chat.completions.parse(
         model=MODEL,
-        temperature=0,
+        temperature=0.2,
         messages=[
             {"role": "system", "content": dedent(summarization_prompt)},
             {"role": "user", "content": text}
