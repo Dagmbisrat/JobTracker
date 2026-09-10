@@ -6,6 +6,7 @@ import signal
 import imaplib
 import logging
 import requests
+from datetime import date
 from dotenv import load_dotenv
 from email.header import decode_header
 from Requests import classify_email, prosses_Email
@@ -17,6 +18,22 @@ DB_API_ADDY = os.getenv('DB_API_ADDY')
 
 if not DB_API_ADDY:
     raise ValueError("Missing required environment variables. Please check your .env file.")
+
+_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+
+def _imap_since():
+    """IMAP SINCE cutoff as DD-Mon-YYYY. Uses the EMAIL_SINCE env var if set,
+    otherwise the current date, so only recent unread mail is ever scanned."""
+    v = os.getenv("EMAIL_SINCE")
+    if v:
+        return v
+    t = date.today()
+    return f"{t.day:02d}-{_MONTHS[t.month - 1]}-{t.year}"
+
+
+EMAIL_SINCE = _imap_since()
 
 # Set up logging
 logging.basicConfig(
@@ -71,8 +88,9 @@ def check_for_new_emails(imap,email_address):
         # Select the mailbox you want to check
         imap.select("INBOX")
 
-        # Search for all unread emails
-        _, message_numbers = imap.search(None, "UNSEEN")
+        # Search for unread emails received on/after the EMAIL_SINCE cutoff
+        logger.info(f"Scanning unread mail since {EMAIL_SINCE} for {email_address}")
+        _, message_numbers = imap.search(None, "UNSEEN", "SINCE", EMAIL_SINCE)
 
         for num in message_numbers[0].split():
             try:

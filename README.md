@@ -107,10 +107,10 @@ Two Python scripts that work together:
 - Runs as a **continuous loop** (checks every 60 seconds)
 - Fetches all users from the DB API
 - For each user with `listening: true`, connects to Gmail via **IMAP SSL**
-- Reads all **unread** emails and passes them to the classifier
+- Reads **unread** emails received on/after the `EMAIL_SINCE` cutoff (defaults to the current date; set it to the deploy date in production so the historical backlog is skipped) and passes them to the classifier
 
 #### `Requests.py`
-- Sends email content to **GPT-4o-mini** via the OpenAI API
+- Sends email content to the OpenAI API (model set by the `MODEL` env var, e.g. `gpt-4.1-mini`)
 - Uses **structured output** (Pydantic) so the response is always a clean JSON object
 - Decides what to do:
   - `type 1` → New application detected → `POST /applications`

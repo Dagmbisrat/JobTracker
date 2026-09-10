@@ -26,5 +26,6 @@ jobs:
           DB_API_ADDY: ${{ secrets.DB_API_ADDY }}
           API_KEY: ${{ secrets.API_KEY }}
           MODEL: ${{ secrets.MODEL }}
+          EMAIL_SINCE: ${{ vars.EMAIL_SINCE }}
         working-directory: ./server
         run: python EmailMonitor.py
