@@ -1,125 +1,141 @@
 /* ============================================================
-   Design tokens — light theme is the default on :root,
-   .dark on <html> flips the values.
+   Design tokens — Geist / vercel.com inspired.
+   Light is the default on :root; .dark on <html> flips it.
+   Near-monochrome surfaces, black/white primary fill,
+   Vercel-blue for links, focus and highlights.
    ============================================================ */
 
 :root {
     /* Surfaces */
-    --background: #f6f7f9;
-    --background-alt: #eef0f3;
+    --background: #ffffff;
+    --background-alt: #fafafa;
     --card-bg: #ffffff;
-    --surface-2: #f7f8fa;
-    --hover-bg: #f3f4f6;
+    --surface-2: #fafafa;
+    --hover-bg: #f2f2f2;
 
     /* Text */
-    --text-primary: #16181d;
-    --text-secondary: #5b6270;
-    --text-muted: #8b93a1;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --text-muted: #8f8f8f;
 
     /* Lines */
-    --border-color: #e6e8ec;
-    --border-strong: #d5d8de;
+    --border-color: #ebebeb;
+    --border-strong: #e0e0e0;
 
-    /* Accent */
-    --accent: #6366f1;
-    --accent-hover: #4f46e5;
+    /* Accent — links, focus rings, highlights */
+    --accent: #0070f3;
+    --accent-hover: #0761d1;
     --accent-contrast: #ffffff;
-    --accent-soft: #eef0ff;
-    --focus-ring: rgba(99, 102, 241, 0.28);
+    --accent-soft: #e5f0ff;
+    --focus-ring: rgba(0, 112, 243, 0.28);
+
+    /* Primary button — monochrome inverted fill */
+    --btn: #000000;
+    --btn-hover: #383838;
+    --btn-fg: #ffffff;
 
     /* Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 18px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
     --radius-full: 9999px;
 
     /* Shadow */
-    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-    --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.08);
-    --shadow-lg: 0 18px 45px -12px rgba(16, 24, 40, 0.22);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
 
     /* Motion */
     --transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Status: pending / interview / talk / offer / rejected */
-    --status-pending-bg: #fef3c7;
-    --status-pending-fg: #92500e;
-    --status-pending-dot: #f59e0b;
+    --status-pending-bg: #fff3d6;
+    --status-pending-fg: #8a5a00;
+    --status-pending-dot: #f5a623;
 
-    --status-interview-bg: #dbeafe;
-    --status-interview-fg: #1e40af;
-    --status-interview-dot: #3b82f6;
+    --status-interview-bg: #e5f0ff;
+    --status-interview-fg: #0058c9;
+    --status-interview-dot: #0070f3;
 
-    --status-talk-bg: #e9e6ff;
-    --status-talk-fg: #4c3fbf;
-    --status-talk-dot: #8b5cf6;
+    --status-talk-bg: #efe7ff;
+    --status-talk-fg: #5a2ca0;
+    --status-talk-dot: #8a63d2;
 
-    --status-offer-bg: #d1fae5;
-    --status-offer-fg: #065f46;
-    --status-offer-dot: #10b981;
+    --status-offer-bg: #daf6e8;
+    --status-offer-fg: #0a6c40;
+    --status-offer-dot: #17c964;
 
-    --status-rejected-bg: #ffe4e6;
-    --status-rejected-fg: #9f1239;
-    --status-rejected-dot: #f43f5e;
+    --status-rejected-bg: #ffe3e0;
+    --status-rejected-fg: #a4160f;
+    --status-rejected-dot: #ee3d38;
 
     /* Error */
-    --error-bg: #fef2f2;
-    --error-border: #fecaca;
-    --error-text: #dc2626;
+    --error-bg: #fdeceb;
+    --error-border: #f7c8c5;
+    --error-text: #d92d20;
 
     /* Live status dot */
-    --live-on: #10b981;
-    --live-off: #f43f5e;
+    --live-on: #17c964;
+    --live-off: #ee3d38;
 }
 
 .dark {
-    --background: #0d0e14;
-    --background-alt: #12141c;
-    --card-bg: #161822;
-    --surface-2: #1c1f2b;
-    --hover-bg: #20242f;
+    /* Deep near-black with a cool slate-blue cast (Vercel base + a touch of blue) */
+    --background: #05070d;
+    --background-alt: #080b13;
+    --card-bg: #0c0f18;
+    --surface-2: #11151f;
+    --hover-bg: #171c29;
 
-    --text-primary: #eceef3;
-    --text-secondary: #a2a9b8;
-    --text-muted: #6f7789;
+    /* Text — cool white */
+    --text-primary: #f1f4fa;
+    --text-secondary: #9aa3b6;
+    --text-muted: #697285;
 
-    --border-color: #262a38;
-    --border-strong: #333849;
+    /* Lines — cool slate hairlines */
+    --border-color: #1b2230;
+    --border-strong: #29313f;
 
-    --accent: #818cf8;
-    --accent-hover: #a5b0ff;
-    --accent-contrast: #10121a;
-    --accent-soft: #1e2233;
-    --focus-ring: rgba(129, 140, 248, 0.32);
+    /* Accent */
+    --accent: #3d97ff;
+    --accent-hover: #63acff;
+    --accent-contrast: #ffffff;
+    --accent-soft: #0e1d33;
+    --focus-ring: rgba(61, 151, 255, 0.32);
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 24px 55px -12px rgba(0, 0, 0, 0.65);
+    /* Primary button — white fill on the dark surface */
+    --btn: #ffffff;
+    --btn-hover: #e2e6ee;
+    --btn-fg: #06080e;
 
-    --status-pending-bg: #3a2c08;
-    --status-pending-fg: #fde68a;
-    --status-pending-dot: #f59e0b;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.72);
 
-    --status-interview-bg: #15294d;
-    --status-interview-fg: #bfdbfe;
-    --status-interview-dot: #60a5fa;
+    --status-pending-bg: #2c2205;
+    --status-pending-fg: #f5d180;
+    --status-pending-dot: #f5a623;
 
-    --status-talk-bg: #241f45;
-    --status-talk-fg: #ddd6fe;
-    --status-talk-dot: #a78bfa;
+    --status-interview-bg: #0a2544;
+    --status-interview-fg: #a9ccff;
+    --status-interview-dot: #3d97ff;
 
-    --status-offer-bg: #0b3d2e;
-    --status-offer-fg: #a7f3d0;
-    --status-offer-dot: #34d399;
+    --status-talk-bg: #1b1d40;
+    --status-talk-fg: #c7c9ff;
+    --status-talk-dot: #8f93ff;
 
-    --status-rejected-bg: #3f1521;
-    --status-rejected-fg: #fecdd3;
-    --status-rejected-dot: #fb7185;
+    --status-offer-bg: #06342a;
+    --status-offer-fg: #86e8c4;
+    --status-offer-dot: #22d3a5;
 
-    --error-bg: #2a1416;
-    --error-border: #7f1d1d;
-    --error-text: #fca5a5;
+    --status-rejected-bg: #351226;
+    --status-rejected-fg: #ffb3cd;
+    --status-rejected-dot: #ff6f9c;
 
-    --live-on: #34d399;
-    --live-off: #fb7185;
+    --error-bg: #241521;
+    --error-border: #6a2038;
+    --error-text: #ff8fb0;
+
+    --live-on: #22d3a5;
+    --live-off: #ff6f9c;
 }

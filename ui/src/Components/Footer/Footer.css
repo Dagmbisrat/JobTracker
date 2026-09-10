@@ -25,8 +25,7 @@
     align-items: center;
 }
 
-.social-icon,
-.footer-theme-toggle {
+.social-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,8 +38,7 @@
     transition: all var(--transition);
 }
 
-.social-icon:hover,
-.footer-theme-toggle:hover {
+.social-icon:hover {
     color: var(--text-primary);
     background: var(--hover-bg);
     border-color: var(--border-color);

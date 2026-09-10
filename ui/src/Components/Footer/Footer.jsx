@@ -1,16 +1,14 @@
 import React from "react";
-import { Github, Linkedin, Moon, Sun } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 import "./Footer.css";
 
-const Footer = ({ isDark, toggleDark }) => {
+const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="dashboard-footer">
       <div className="footer-content">
-        <div className="footer-copyright">
-          © {currentYear} JobTracker
-        </div>
+        <div className="footer-copyright">© {currentYear} JobTracker</div>
         <div className="footer-social">
           <a
             href="https://github.com/Dagmbisrat"
@@ -30,13 +28,6 @@ const Footer = ({ isDark, toggleDark }) => {
           >
             <Linkedin size={18} />
           </a>
-          <button
-            onClick={toggleDark}
-            className="footer-theme-toggle"
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
         </div>
       </div>
     </footer>

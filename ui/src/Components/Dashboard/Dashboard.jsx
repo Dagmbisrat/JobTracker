@@ -14,6 +14,7 @@ import {
 import "./Dashboard.css";
 import Footer from "../Footer/Footer.jsx";
 import StatusIndicator from "../StatusIndicator/StatusIndicator.jsx";
+import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -214,6 +215,11 @@ const Dashboard = () => {
           </div>
           <div className="app-bar-actions">
             <StatusIndicator isListening={user ? user.listening : false} />
+            <DarkModeToggle
+              isDark={isDark}
+              toggleDark={toggleDark}
+              variant="inline"
+            />
             <button onClick={handleLogout} className="logout-button">
               <LogOut size={16} />
               <span>Logout</span>
@@ -363,7 +369,7 @@ const Dashboard = () => {
         </div>
       </main>
 
-      <Footer isDark={isDark} toggleDark={toggleDark} />
+      <Footer />
     </div>
   );
 };

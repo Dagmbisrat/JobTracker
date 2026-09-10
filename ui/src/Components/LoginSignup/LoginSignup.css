@@ -10,20 +10,15 @@
     overflow: hidden;
 }
 
-/* soft accent glow behind the card */
+/* very subtle vignette behind the card */
 .auth-container::before {
     content: "";
     position: absolute;
-    top: -18%;
-    left: 50%;
-    width: 680px;
-    height: 680px;
-    max-width: 120vw;
-    transform: translateX(-50%);
+    inset: 0;
     background: radial-gradient(
-        circle at center,
-        var(--focus-ring),
-        transparent 62%
+        ellipse 80% 55% at 50% 0%,
+        var(--hover-bg),
+        transparent 70%
     );
     pointer-events: none;
     z-index: 0;
@@ -183,13 +178,13 @@
     width: 100%;
     height: 2.85rem;
     margin-top: 0.25rem;
-    background-color: var(--accent);
-    color: var(--accent-contrast);
+    background-color: var(--btn);
+    color: var(--btn-fg);
     box-shadow: var(--shadow-sm);
 }
 
 .auth-submit-button:hover:not(:disabled) {
-    background-color: var(--accent-hover);
+    background-color: var(--btn-hover);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
