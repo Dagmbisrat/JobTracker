@@ -1,17 +1,27 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DB_API_ADDY } from "../Config.js";
-import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
-import { Loader2, ArrowUpDown, Filter, LogOut } from "lucide-react";
+import {
+  ArrowUpDown,
+  Search,
+  LogOut,
+  Inbox,
+  Briefcase,
+  CalendarClock,
+  Trophy,
+  XCircle,
+} from "lucide-react";
 import "./Dashboard.css";
 import Footer from "../Footer/Footer.jsx";
 import StatusIndicator from "../StatusIndicator/StatusIndicator.jsx";
+import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState({
     key: "app_date",
     direction: "desc",
@@ -122,6 +132,14 @@ const Dashboard = () => {
     .filter((app) =>
       selectedStatus === "All" ? true : app.status === selectedStatus,
     )
+    .filter((app) => {
+      const q = search.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        (app.company_name || "").toLowerCase().includes(q) ||
+        (app.job_title || "").toLowerCase().includes(q)
+      );
+    })
     .sort((a, b) => {
       if (sortConfig.key === "app_date") {
         const dateA = new Date(a[sortConfig.key]);
@@ -138,71 +156,131 @@ const Dashboard = () => {
       return 0;
     });
 
+  const countByStatus = (status) =>
+    applications.filter((app) => app.status === status).length;
+
+  const stats = [
+    {
+      label: "Total",
+      value: applications.length,
+      icon: Briefcase,
+      tone: "neutral",
+    },
+    {
+      label: "Interviews",
+      value: countByStatus("Interview Scheduled"),
+      icon: CalendarClock,
+      tone: "interview",
+    },
+    {
+      label: "Offers",
+      value: countByStatus("Offer Received"),
+      icon: Trophy,
+      tone: "offer",
+    },
+    {
+      label: "Rejected",
+      value: countByStatus("Rejected"),
+      icon: XCircle,
+      tone: "rejected",
+    },
+  ];
+
   const getStatusClassName = (status) => {
-    const baseClass = isDark ? "status-badge-dark" : "status-badge-light";
-    return `status-badge ${baseClass} status-${status
-      .toLowerCase()
-      .replace(/ /g, "-")}`;
+    return `status-badge status-${status.toLowerCase().replace(/ /g, "-")}`;
   };
 
   const getSortIndicator = (columnKey) => {
-    if (sortConfig.key === columnKey) {
-      return (
-        <span className={`sort-indicator ${sortConfig.direction}`}>
-          <ArrowUpDown size={16} />
-        </span>
-      );
-    }
-    return <ArrowUpDown size={16} className="sort-indicator-inactive" />;
+    const active = sortConfig.key === columnKey;
+    return (
+      <ArrowUpDown
+        size={14}
+        className={`sort-indicator ${active ? `active ${sortConfig.direction}` : ""}`}
+      />
+    );
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <Loader2 className="loading-spinner" />
-      </div>
-    );
-  }
+  const user =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "null")
+      : null;
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-content">
-        <div className="dashboard-card">
-          <div className="dashboard-header">
-            <div className="header-top">
-              <h1 className="dashboard-title">My Applications</h1>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-              >
-                <StatusIndicator
-                  isListening={
-                    JSON.parse(localStorage.getItem("user")).listening
-                  }
-                />
-                <button onClick={handleLogout} className="logout-button">
-                  <LogOut size={16} className="logout-icon" />
-                  <span>Logout</span>
-                </button>
+      <header className="app-bar">
+        <div className="app-bar-inner">
+          <div className="app-brand">
+            <img src="/Suitcase1.svg" alt="" className="app-logo" />
+            <span className="app-wordmark">JobTracker</span>
+          </div>
+          <div className="app-bar-actions">
+            <StatusIndicator isListening={user ? user.listening : false} />
+            <DarkModeToggle
+              isDark={isDark}
+              toggleDark={toggleDark}
+              variant="inline"
+            />
+            <button onClick={handleLogout} className="logout-button">
+              <LogOut size={16} />
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="dashboard-content">
+        <div className="page-heading">
+          <h1 className="dashboard-title">My Applications</h1>
+          <p className="dashboard-subtitle">
+            {user?.email ? user.email : "Your job search, tracked automatically."}
+          </p>
+        </div>
+
+        <div className="stat-grid">
+          {stats.map((s) => (
+            <div key={s.label} className={`stat-card tone-${s.tone}`}>
+              <div className="stat-icon">
+                <s.icon size={18} />
+              </div>
+              <div className="stat-body">
+                <span className="stat-value">{loading ? "—" : s.value}</span>
+                <span className="stat-label">{s.label}</span>
               </div>
             </div>
-            <div className="filter-section">
-              <div className="filter-container">
-                <Filter size={16} className="filter-icon" />
-                <select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="status-filter"
-                >
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="entries-count">
-                {filteredAndSortedApplications.length} entries
-              </div>
+          ))}
+        </div>
+
+        <div className="panel">
+          <div className="toolbar">
+            <div className="search-field">
+              <Search size={16} className="search-icon" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search company or position"
+                className="search-input"
+              />
+            </div>
+            <div className="toolbar-right">
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="status-filter"
+                aria-label="Filter by status"
+              >
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <span className="entries-count">
+                {filteredAndSortedApplications.length}
+                {filteredAndSortedApplications.length === 1
+                  ? " entry"
+                  : " entries"}
+              </span>
             </div>
           </div>
 
@@ -214,41 +292,74 @@ const Dashboard = () => {
                     onClick={() => handleSort("company_name")}
                     className="sortable-header"
                   >
-                    Company {getSortIndicator("company_name")}
+                    <span>Company {getSortIndicator("company_name")}</span>
                   </th>
                   <th
                     onClick={() => handleSort("job_title")}
                     className="sortable-header"
                   >
-                    Position {getSortIndicator("job_title")}
+                    <span>Position {getSortIndicator("job_title")}</span>
                   </th>
                   <th>Status</th>
                   <th
                     onClick={() => handleSort("app_date")}
                     className="sortable-header"
                   >
-                    Date Applied {getSortIndicator("app_date")}
+                    <span>Date Applied {getSortIndicator("app_date")}</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredAndSortedApplications.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <tr key={i} className="skeleton-row">
+                      <td data-label="Company">
+                        <span className="skeleton" style={{ width: "60%" }} />
+                      </td>
+                      <td data-label="Position">
+                        <span className="skeleton" style={{ width: "80%" }} />
+                      </td>
+                      <td data-label="Status">
+                        <span
+                          className="skeleton"
+                          style={{ width: "5.5rem", height: "1.4rem" }}
+                        />
+                      </td>
+                      <td data-label="Date Applied">
+                        <span className="skeleton" style={{ width: "4.5rem" }} />
+                      </td>
+                    </tr>
+                  ))
+                ) : filteredAndSortedApplications.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="empty-message">
-                      No applications found
+                    <td colSpan="4">
+                      <div className="empty-state">
+                        <Inbox size={28} />
+                        <p className="empty-title">No applications found</p>
+                        <p className="empty-hint">
+                          {applications.length === 0
+                            ? "New applications will show up here as your inbox is scanned."
+                            : "Try a different search or status filter."}
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   filteredAndSortedApplications.map((app, index) => (
                     <tr key={index}>
-                      <td>{app.company_name}</td>
-                      <td>{app.job_title}</td>
-                      <td>
+                      <td data-label="Company" className="cell-company">
+                        {app.company_name}
+                      </td>
+                      <td data-label="Position">{app.job_title}</td>
+                      <td data-label="Status">
                         <span className={getStatusClassName(app.status)}>
+                          <span className="badge-dot" />
                           {app.status}
                         </span>
                       </td>
-                      <td>{formatDate(app.app_date)}</td>
+                      <td data-label="Date Applied" className="cell-date">
+                        {formatDate(app.app_date)}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -256,8 +367,9 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-      </div>
-      <Footer isDark={isDark} toggleDark={toggleDark} />
+      </main>
+
+      <Footer />
     </div>
   );
 };

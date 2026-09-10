@@ -1,31 +1,77 @@
-.theme-toggle {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
-    padding: 0.5rem;
-    border-radius: 9999px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
+.theme-switch {
+    padding: 0;
+    border: none;
+    background: none;
     cursor: pointer;
+    line-height: 0;
+    border-radius: var(--radius-full);
+}
+
+.theme-switch.fixed {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
     z-index: 100;
-    transition: all 0.2s ease;
+}
+
+.theme-switch-track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 54px;
+    height: 28px;
+    padding: 0 7px;
+    border-radius: var(--radius-full);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-sm);
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.theme-switch:hover .theme-switch-track {
+    border-color: var(--accent);
+}
+
+.theme-switch.is-dark .theme-switch-track {
+    background: var(--hover-bg);
+    border-color: var(--border-strong);
+}
+
+.theme-switch-ghost {
+    color: var(--text-muted);
+    opacity: 0.45;
+}
+
+.theme-switch-knob {
+    position: absolute;
+    top: 50%;
+    left: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    color: #f59e0b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transform: translateY(-50%);
+    transition: transform var(--transition), background var(--transition),
+        color var(--transition);
 }
 
-.theme-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.theme-switch.is-dark .theme-switch-knob {
+    transform: translateY(-50%) translateX(26px);
+    background: var(--btn);
+    color: var(--btn-fg);
 }
 
-.theme-toggle:active {
-    transform: scale(0.95);
+.theme-switch:active .theme-switch-knob {
+    width: 24px;
 }
 
-.theme-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    color: var(--text-primary);
-    transition: color 0.2s ease;
+.theme-switch:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
 }

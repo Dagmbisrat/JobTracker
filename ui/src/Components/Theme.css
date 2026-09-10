@@ -1,66 +1,141 @@
+/* ============================================================
+   Design tokens — Geist / vercel.com inspired.
+   Light is the default on :root; .dark on <html> flips it.
+   Near-monochrome surfaces, black/white primary fill,
+   Vercel-blue for links, focus and highlights.
+   ============================================================ */
+
 :root {
-    /* Light theme defaults */
-    --background: #f3f4f6;
+    /* Surfaces */
+    --background: #ffffff;
+    --background-alt: #fafafa;
     --card-bg: #ffffff;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --border-color: #d1d5db;
-    --input-focus: #2563eb;
-    --button-bg: #2563eb;
-    --button-hover: #1d4ed8;
-    --button-disabled: #93c5fd;
-    --hover-bg: #f9fafb;
+    --surface-2: #fafafa;
+    --hover-bg: #f2f2f2;
 
-    /* Status colors - Light mode */
-    --status-pending: #fef3c7;
-    --status-pending-text: #78350f;
-    --status-rejected: #fee2e2;
-    --status-rejected-text: #991b1b;
-    --status-interview: #dbeafe;
-    --status-interview-text: #1e3a8a;
-    --status-talk: #e0e7ff;
-    --status-talk-text: #312e81;
-    --status-offer: #d1fae5;
-    --status-offer-text: #064e3b;
+    /* Text */
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --text-muted: #8f8f8f;
 
-    /* Error states - Light mode */
-    --error-bg: #fee2e2;
-    --error-border: #fecaca;
-    --error-text: #dc2626;
+    /* Lines */
+    --border-color: #ebebeb;
+    --border-strong: #e0e0e0;
+
+    /* Accent — links, focus rings, highlights */
+    --accent: #0070f3;
+    --accent-hover: #0761d1;
+    --accent-contrast: #ffffff;
+    --accent-soft: #e5f0ff;
+    --focus-ring: rgba(0, 112, 243, 0.28);
+
+    /* Primary button — monochrome inverted fill */
+    --btn: #000000;
+    --btn-hover: #383838;
+    --btn-fg: #ffffff;
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+
+    /* Shadow */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
+
+    /* Motion */
+    --transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Status: pending / interview / talk / offer / rejected */
+    --status-pending-bg: #fff3d6;
+    --status-pending-fg: #8a5a00;
+    --status-pending-dot: #f5a623;
+
+    --status-interview-bg: #e5f0ff;
+    --status-interview-fg: #0058c9;
+    --status-interview-dot: #0070f3;
+
+    --status-talk-bg: #efe7ff;
+    --status-talk-fg: #5a2ca0;
+    --status-talk-dot: #8a63d2;
+
+    --status-offer-bg: #daf6e8;
+    --status-offer-fg: #0a6c40;
+    --status-offer-dot: #17c964;
+
+    --status-rejected-bg: #ffe3e0;
+    --status-rejected-fg: #a4160f;
+    --status-rejected-dot: #ee3d38;
+
+    /* Error */
+    --error-bg: #fdeceb;
+    --error-border: #f7c8c5;
+    --error-text: #d92d20;
+
+    /* Live status dot */
+    --live-on: #17c964;
+    --live-off: #ee3d38;
 }
 
-/* Dark theme overrides */
 .dark {
-    /* Darker backgrounds */
-    --background: #0f172a; /* Darker blue-gray background */
-    --card-bg: #1e293b; /* Darker card background */
-    --hover-bg: #334155; /* Lighter hover state for contrast */
+    /* Deep near-black with a cool slate-blue cast (Vercel base + a touch of blue) */
+    --background: #05070d;
+    --background-alt: #080b13;
+    --card-bg: #0c0f18;
+    --surface-2: #11151f;
+    --hover-bg: #171c29;
 
-    /* Brighter text for better contrast */
-    --text-primary: #f8fafc; /* Brighter white text */
-    --text-secondary: #e2e8f0; /* Lighter secondary text */
-    --border-color: #475569; /* More visible borders */
+    /* Text — cool white */
+    --text-primary: #f1f4fa;
+    --text-secondary: #9aa3b6;
+    --text-muted: #697285;
 
-    /* More vibrant interactive elements */
-    --input-focus: #4f46e5; /* More vibrant indigo */
-    --button-bg: #4f46e5; /* Matching indigo */
-    --button-hover: #6366f1; /* Brighter hover state */
-    --button-disabled: #818cf8; /* Lighter disabled state */
+    /* Lines — cool slate hairlines */
+    --border-color: #1b2230;
+    --border-strong: #29313f;
 
-    /* Status colors - Enhanced for dark mode */
-    --status-pending: #854d0e; /* Darker amber */
-    --status-pending-text: #fef3c7;
-    --status-rejected: #be123c; /* Deeper red */
-    --status-rejected-text: #fecdd3;
-    --status-interview: #1e40af; /* Richer blue */
-    --status-interview-text: #dbeafe;
-    --status-talk: #3730a3; /* Deeper indigo */
-    --status-talk-text: #e0e7ff;
-    --status-offer: #047857; /* Deeper green */
-    --status-offer-text: #d1fae5;
+    /* Accent */
+    --accent: #3d97ff;
+    --accent-hover: #63acff;
+    --accent-contrast: #ffffff;
+    --accent-soft: #0e1d33;
+    --focus-ring: rgba(61, 151, 255, 0.32);
 
-    /* Error states - Enhanced contrast */
-    --error-bg: #991b1b; /* Deeper red background */
-    --error-border: #dc2626; /* Brighter red border */
-    --error-text: #fecaca; /* Lighter error text */
+    /* Primary button — white fill on the dark surface */
+    --btn: #ffffff;
+    --btn-hover: #e2e6ee;
+    --btn-fg: #06080e;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.72);
+
+    --status-pending-bg: #2c2205;
+    --status-pending-fg: #f5d180;
+    --status-pending-dot: #f5a623;
+
+    --status-interview-bg: #0a2544;
+    --status-interview-fg: #a9ccff;
+    --status-interview-dot: #3d97ff;
+
+    --status-talk-bg: #1b1d40;
+    --status-talk-fg: #c7c9ff;
+    --status-talk-dot: #8f93ff;
+
+    --status-offer-bg: #06342a;
+    --status-offer-fg: #86e8c4;
+    --status-offer-dot: #22d3a5;
+
+    --status-rejected-bg: #351226;
+    --status-rejected-fg: #ffb3cd;
+    --status-rejected-dot: #ff6f9c;
+
+    --error-bg: #241521;
+    --error-border: #6a2038;
+    --error-text: #ff8fb0;
+
+    --live-on: #22d3a5;
+    --live-off: #ff6f9c;
 }

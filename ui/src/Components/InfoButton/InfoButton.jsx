@@ -2,27 +2,32 @@ import React, { useState } from "react";
 import { Info, X } from "lucide-react";
 import "./InfoButton.css";
 
-const InfoButton = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const InfoButton = ({ open, onOpenChange }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
 
-  const toggleInfo = () => {
-    setIsOpen(!isOpen);
+  const setOpen = (value) => {
+    if (!isControlled) setInternalOpen(value);
+    if (onOpenChange) onOpenChange(value);
   };
+
+  const toggleInfo = () => setOpen(!isOpen);
 
   return (
     <>
       <button
         className="info-button"
         onClick={toggleInfo}
-        aria-label="Show signup information"
+        aria-label="How to get a Google App Password"
       >
         <Info className="info-icon" />
       </button>
 
       {isOpen && (
-        <div className="info-overlay" onClick={toggleInfo}>
+        <div className="info-overlay" onClick={() => setOpen(false)}>
           <div className="info-popup" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={toggleInfo}>
+            <button className="close-button" onClick={() => setOpen(false)}>
               <X className="close-icon" />
             </button>
 
@@ -44,7 +49,8 @@ const InfoButton = () => {
               <h4>Step 2: Enable 2-Step Verification</h4>
               <ul>
                 <li>
-                  <strong>Navigate to:</strong> Security > 2-Step Verification
+                  <strong>Navigate to:</strong> Security &rarr; 2-Step
+                  Verification
                 </li>
                 <li>
                   <strong>Follow:</strong> The setup process if not already
@@ -55,8 +61,8 @@ const InfoButton = () => {
               <h4>Step 3: Generate App Password</h4>
               <ul>
                 <li>
-                  <strong>Go to:</strong> Security > 2-Step Verification > App
-                  Passwords
+                  <strong>Go to:</strong> Security &rarr; 2-Step Verification
+                  &rarr; App Passwords
                 </li>
                 <li>
                   <strong>Select app:</strong> Choose "Mail" from the dropdown
