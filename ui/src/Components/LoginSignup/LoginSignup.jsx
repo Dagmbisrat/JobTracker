@@ -2,18 +2,22 @@ import "./LoginSignup.css";
 import { DB_API_ADDY } from "../Config.js";
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { AlertCircle, Loader2, Moon, Sun } from "lucide-react";
+import {
+  AlertCircle,
+  Loader2,
+  Mail,
+  Lock,
+  User,
+  KeyRound,
+} from "lucide-react";
 import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
 import InfoButton from "../InfoButton/InfoButton.jsx";
 
-const Button = ({ children, ...props }) => (
-  <button {...props} className={`button ${props.className || ""}`}>
-    {children}
-  </button>
-);
-
-const Input = ({ ...props }) => (
-  <input {...props} className={`input ${props.className || ""}`} />
+const Field = ({ icon: Icon, ...props }) => (
+  <div className="field">
+    {Icon && <Icon className="field-icon" size={18} aria-hidden="true" />}
+    <input {...props} className={`input ${props.className || ""}`} />
+  </div>
 );
 
 const AuthComponent = () => {
@@ -159,23 +163,67 @@ const AuthComponent = () => {
     }
   };
 
+  const switchMode = (loginMode) => {
+    if (loginMode === isLogin) return;
+    setIsLogin(loginMode);
+    setError("");
+    setPasswordError("");
+    setFormData({
+      email: "",
+      password: "",
+      verifyPassword: "",
+      name: "",
+      email_app_password: "",
+    });
+  };
+
   return (
     <div className="auth-container">
       <DarkModeToggle isDark={isDark} toggleDark={toggleDark} />
 
       <div className="auth-card">
+        <div className="auth-brand">
+          <img src="/Suitcase1.svg" alt="" className="auth-logo" />
+          <span className="auth-wordmark">JobTracker</span>
+        </div>
+
         <div className="auth-header">
-          <h2 className="auth-title">{isLogin ? "Login" : "Sign Up"}</h2>
+          <h2 className="auth-title">
+            {isLogin ? "Welcome back" : "Create your account"}
+          </h2>
           <p className="auth-description">
-            {isLogin ? "Welcome back!" : "Create a new account to get started."}
+            {isLogin
+              ? "Log in to see your application pipeline."
+              : "Connect your inbox and let it track applications for you."}
           </p>
+        </div>
+
+        <div className="auth-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={isLogin}
+            className={`auth-tab ${isLogin ? "active" : ""}`}
+            onClick={() => switchMode(true)}
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!isLogin}
+            className={`auth-tab ${!isLogin ? "active" : ""}`}
+            onClick={() => switchMode(false)}
+          >
+            Sign up
+          </button>
         </div>
 
         <div className="auth-content">
           <form onSubmit={handleSubmit} className="auth-form">
             {error && (
-              <div className="auth-error">
-                <AlertCircle className="error-icon" />
+              <div className="auth-error" role="alert">
+                <AlertCircle className="error-icon" size={18} />
                 <p>{error}</p>
               </div>
             )}
@@ -183,7 +231,8 @@ const AuthComponent = () => {
             {!isLogin && (
               <div className="form-group">
                 <label>Name</label>
-                <Input
+                <Field
+                  icon={User}
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
@@ -195,7 +244,8 @@ const AuthComponent = () => {
 
             <div className="form-group">
               <label>Email</label>
-              <Input
+              <Field
+                icon={Mail}
                 name="email"
                 type="email"
                 value={formData.email}
@@ -207,7 +257,8 @@ const AuthComponent = () => {
 
             <div className="form-group">
               <label>Password</label>
-              <Input
+              <Field
+                icon={Lock}
                 name="password"
                 type="password"
                 value={formData.password}
@@ -221,7 +272,8 @@ const AuthComponent = () => {
               <>
                 <div className="form-group">
                   <label>Verify Password</label>
-                  <Input
+                  <Field
+                    icon={Lock}
                     name="verifyPassword"
                     type="password"
                     value={formData.verifyPassword}
@@ -235,56 +287,40 @@ const AuthComponent = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Email App Password</label>
-                  <Input
+                  <label>
+                    Email App Password
+                    <span className="label-hint"> · Gmail 16-char code</span>
+                  </label>
+                  <Field
+                    icon={KeyRound}
                     name="email_app_password"
                     type="password"
                     value={formData.email_app_password}
                     onChange={handleChange}
-                    placeholder="Your email app password"
+                    placeholder="xxxx xxxx xxxx xxxx"
                     required
                   />
                 </div>
               </>
             )}
 
-            <Button
+            <button
               type="submit"
-              className="auth-submit-button"
+              className="button auth-submit-button"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <Loader2 className="loading-icon" />
+                  <Loader2 className="loading-icon" size={18} />
                   <span>{isLogin ? "Logging in..." : "Signing up..."}</span>
                 </>
               ) : isLogin ? (
-                "Login"
+                "Log in"
               ) : (
-                "Sign Up"
+                "Create account"
               )}
-            </Button>
+            </button>
           </form>
-
-          <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError("");
-              setPasswordError("");
-              setFormData({
-                email: "",
-                password: "",
-                verifyPassword: "",
-                name: "",
-                email_app_password: "",
-              });
-            }}
-            className="auth-toggle-button"
-          >
-            {isLogin
-              ? "Don't have an account? Sign up"
-              : "Already have an account? Login"}
-          </button>
         </div>
       </div>
       {!isLogin && <InfoButton />}

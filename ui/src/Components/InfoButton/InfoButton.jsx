@@ -44,7 +44,8 @@ const InfoButton = () => {
               <h4>Step 2: Enable 2-Step Verification</h4>
               <ul>
                 <li>
-                  <strong>Navigate to:</strong> Security > 2-Step Verification
+                  <strong>Navigate to:</strong> Security &rarr; 2-Step
+                  Verification
                 </li>
                 <li>
                   <strong>Follow:</strong> The setup process if not already
@@ -55,8 +56,8 @@ const InfoButton = () => {
               <h4>Step 3: Generate App Password</h4>
               <ul>
                 <li>
-                  <strong>Go to:</strong> Security > 2-Step Verification > App
-                  Passwords
+                  <strong>Go to:</strong> Security &rarr; 2-Step Verification
+                  &rarr; App Passwords
                 </li>
                 <li>
                   <strong>Select app:</strong> Choose "Mail" from the dropdown

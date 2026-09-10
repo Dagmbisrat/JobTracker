@@ -1,66 +1,125 @@
+/* ============================================================
+   Design tokens — light theme is the default on :root,
+   .dark on <html> flips the values.
+   ============================================================ */
+
 :root {
-    /* Light theme defaults */
-    --background: #f3f4f6;
+    /* Surfaces */
+    --background: #f6f7f9;
+    --background-alt: #eef0f3;
     --card-bg: #ffffff;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --border-color: #d1d5db;
-    --input-focus: #2563eb;
-    --button-bg: #2563eb;
-    --button-hover: #1d4ed8;
-    --button-disabled: #93c5fd;
-    --hover-bg: #f9fafb;
+    --surface-2: #f7f8fa;
+    --hover-bg: #f3f4f6;
 
-    /* Status colors - Light mode */
-    --status-pending: #fef3c7;
-    --status-pending-text: #78350f;
-    --status-rejected: #fee2e2;
-    --status-rejected-text: #991b1b;
-    --status-interview: #dbeafe;
-    --status-interview-text: #1e3a8a;
-    --status-talk: #e0e7ff;
-    --status-talk-text: #312e81;
-    --status-offer: #d1fae5;
-    --status-offer-text: #064e3b;
+    /* Text */
+    --text-primary: #16181d;
+    --text-secondary: #5b6270;
+    --text-muted: #8b93a1;
 
-    /* Error states - Light mode */
-    --error-bg: #fee2e2;
+    /* Lines */
+    --border-color: #e6e8ec;
+    --border-strong: #d5d8de;
+
+    /* Accent */
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-contrast: #ffffff;
+    --accent-soft: #eef0ff;
+    --focus-ring: rgba(99, 102, 241, 0.28);
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-full: 9999px;
+
+    /* Shadow */
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.08);
+    --shadow-lg: 0 18px 45px -12px rgba(16, 24, 40, 0.22);
+
+    /* Motion */
+    --transition: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Status: pending / interview / talk / offer / rejected */
+    --status-pending-bg: #fef3c7;
+    --status-pending-fg: #92500e;
+    --status-pending-dot: #f59e0b;
+
+    --status-interview-bg: #dbeafe;
+    --status-interview-fg: #1e40af;
+    --status-interview-dot: #3b82f6;
+
+    --status-talk-bg: #e9e6ff;
+    --status-talk-fg: #4c3fbf;
+    --status-talk-dot: #8b5cf6;
+
+    --status-offer-bg: #d1fae5;
+    --status-offer-fg: #065f46;
+    --status-offer-dot: #10b981;
+
+    --status-rejected-bg: #ffe4e6;
+    --status-rejected-fg: #9f1239;
+    --status-rejected-dot: #f43f5e;
+
+    /* Error */
+    --error-bg: #fef2f2;
     --error-border: #fecaca;
     --error-text: #dc2626;
+
+    /* Live status dot */
+    --live-on: #10b981;
+    --live-off: #f43f5e;
 }
 
-/* Dark theme overrides */
 .dark {
-    /* Darker backgrounds */
-    --background: #0f172a; /* Darker blue-gray background */
-    --card-bg: #1e293b; /* Darker card background */
-    --hover-bg: #334155; /* Lighter hover state for contrast */
+    --background: #0d0e14;
+    --background-alt: #12141c;
+    --card-bg: #161822;
+    --surface-2: #1c1f2b;
+    --hover-bg: #20242f;
 
-    /* Brighter text for better contrast */
-    --text-primary: #f8fafc; /* Brighter white text */
-    --text-secondary: #e2e8f0; /* Lighter secondary text */
-    --border-color: #475569; /* More visible borders */
+    --text-primary: #eceef3;
+    --text-secondary: #a2a9b8;
+    --text-muted: #6f7789;
 
-    /* More vibrant interactive elements */
-    --input-focus: #4f46e5; /* More vibrant indigo */
-    --button-bg: #4f46e5; /* Matching indigo */
-    --button-hover: #6366f1; /* Brighter hover state */
-    --button-disabled: #818cf8; /* Lighter disabled state */
+    --border-color: #262a38;
+    --border-strong: #333849;
 
-    /* Status colors - Enhanced for dark mode */
-    --status-pending: #854d0e; /* Darker amber */
-    --status-pending-text: #fef3c7;
-    --status-rejected: #be123c; /* Deeper red */
-    --status-rejected-text: #fecdd3;
-    --status-interview: #1e40af; /* Richer blue */
-    --status-interview-text: #dbeafe;
-    --status-talk: #3730a3; /* Deeper indigo */
-    --status-talk-text: #e0e7ff;
-    --status-offer: #047857; /* Deeper green */
-    --status-offer-text: #d1fae5;
+    --accent: #818cf8;
+    --accent-hover: #a5b0ff;
+    --accent-contrast: #10121a;
+    --accent-soft: #1e2233;
+    --focus-ring: rgba(129, 140, 248, 0.32);
 
-    /* Error states - Enhanced contrast */
-    --error-bg: #991b1b; /* Deeper red background */
-    --error-border: #dc2626; /* Brighter red border */
-    --error-text: #fecaca; /* Lighter error text */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 24px 55px -12px rgba(0, 0, 0, 0.65);
+
+    --status-pending-bg: #3a2c08;
+    --status-pending-fg: #fde68a;
+    --status-pending-dot: #f59e0b;
+
+    --status-interview-bg: #15294d;
+    --status-interview-fg: #bfdbfe;
+    --status-interview-dot: #60a5fa;
+
+    --status-talk-bg: #241f45;
+    --status-talk-fg: #ddd6fe;
+    --status-talk-dot: #a78bfa;
+
+    --status-offer-bg: #0b3d2e;
+    --status-offer-fg: #a7f3d0;
+    --status-offer-dot: #34d399;
+
+    --status-rejected-bg: #3f1521;
+    --status-rejected-fg: #fecdd3;
+    --status-rejected-dot: #fb7185;
+
+    --error-bg: #2a1416;
+    --error-border: #7f1d1d;
+    --error-text: #fca5a5;
+
+    --live-on: #34d399;
+    --live-off: #fb7185;
 }
