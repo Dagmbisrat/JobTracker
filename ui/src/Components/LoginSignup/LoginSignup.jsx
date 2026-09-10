@@ -26,6 +26,7 @@ const AuthComponent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [showGuide, setShowGuide] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return (
@@ -149,10 +150,18 @@ const AuthComponent = () => {
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
+      // If signup failed because the Gmail App Password didn't work, the user
+      // most likely doesn't know how to create one — surface the guide.
+      if (!isLogin && /credential|app password/i.test(err.message || "")) {
+        setShowGuide(true);
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const isAppPasswordError =
+    !isLogin && /credential|app password/i.test(error || "");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -168,6 +177,7 @@ const AuthComponent = () => {
     setIsLogin(loginMode);
     setError("");
     setPasswordError("");
+    setShowGuide(false);
     setFormData({
       email: "",
       password: "",
@@ -224,7 +234,18 @@ const AuthComponent = () => {
             {error && (
               <div className="auth-error" role="alert">
                 <AlertCircle className="error-icon" size={18} />
-                <p>{error}</p>
+                <div className="auth-error-body">
+                  <p>{error}</p>
+                  {isAppPasswordError && (
+                    <button
+                      type="button"
+                      className="auth-error-action"
+                      onClick={() => setShowGuide(true)}
+                    >
+                      How to get a Google App Password &rarr;
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -300,6 +321,13 @@ const AuthComponent = () => {
                     placeholder="xxxx xxxx xxxx xxxx"
                     required
                   />
+                  <button
+                    type="button"
+                    className="field-help-link"
+                    onClick={() => setShowGuide(true)}
+                  >
+                    Don&apos;t have one? Read the setup guide
+                  </button>
                 </div>
               </>
             )}
@@ -323,7 +351,9 @@ const AuthComponent = () => {
           </form>
         </div>
       </div>
-      {!isLogin && <InfoButton />}
+      {!isLogin && (
+        <InfoButton open={showGuide} onOpenChange={setShowGuide} />
+      )}
     </div>
   );
 };

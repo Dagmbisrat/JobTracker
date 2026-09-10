@@ -2,27 +2,32 @@ import React, { useState } from "react";
 import { Info, X } from "lucide-react";
 import "./InfoButton.css";
 
-const InfoButton = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const InfoButton = ({ open, onOpenChange }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
 
-  const toggleInfo = () => {
-    setIsOpen(!isOpen);
+  const setOpen = (value) => {
+    if (!isControlled) setInternalOpen(value);
+    if (onOpenChange) onOpenChange(value);
   };
+
+  const toggleInfo = () => setOpen(!isOpen);
 
   return (
     <>
       <button
         className="info-button"
         onClick={toggleInfo}
-        aria-label="Show signup information"
+        aria-label="How to get a Google App Password"
       >
         <Info className="info-icon" />
       </button>
 
       {isOpen && (
-        <div className="info-overlay" onClick={toggleInfo}>
+        <div className="info-overlay" onClick={() => setOpen(false)}>
           <div className="info-popup" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={toggleInfo}>
+            <button className="close-button" onClick={() => setOpen(false)}>
               <X className="close-icon" />
             </button>
 
