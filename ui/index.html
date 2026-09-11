@@ -15,6 +15,14 @@
             rel="stylesheet"
         />
         <title>JobTracker</title>
+        <script>
+            // Apply the saved theme variant before first paint (no flash).
+            try {
+                var v = localStorage.getItem("themeVariant");
+                if (v && v !== "slate")
+                    document.documentElement.setAttribute("data-theme", v);
+            } catch (e) {}
+        </script>
     </head>
     <body>
         <div id="root"></div>
