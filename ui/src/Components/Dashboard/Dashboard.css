@@ -277,6 +277,40 @@
     gap: 0.35rem;
 }
 
+.applications-table .col-actions {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.row-edit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity var(--transition), color var(--transition),
+        background var(--transition), border-color var(--transition);
+}
+
+/* reveal on row hover, or via keyboard focus, instead of sitting there always */
+.applications-table tbody tr:hover .row-edit-button,
+.applications-table tbody tr:focus-within .row-edit-button,
+.row-edit-button:focus-visible {
+    opacity: 1;
+}
+
+.row-edit-button:hover {
+    color: var(--text-primary);
+    background: var(--hover-bg);
+    border-color: var(--border-color);
+}
+
 .sortable-header {
     cursor: pointer;
     user-select: none;
@@ -453,6 +487,20 @@
         letter-spacing: 0.04em;
         color: var(--text-muted);
         text-align: left;
+    }
+
+    .applications-table .col-actions {
+        justify-content: flex-end;
+        padding-top: 0.5rem;
+    }
+
+    /* no hover on touch — keep the edit action reachable in the card layout */
+    .row-edit-button {
+        opacity: 1;
+    }
+
+    .applications-table .col-actions::before {
+        content: none;
     }
 
     .empty-state {

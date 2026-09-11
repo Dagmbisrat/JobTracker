@@ -2,7 +2,7 @@ import os
 import bcrypt
 import imaplib
 from enum import Enum
-from typing import List
+from typing import List, Optional
 from slowapi import Limiter
 from dotenv import load_dotenv
 from jose import JWTError, jwt
@@ -84,10 +84,16 @@ class Application(BaseModel):
     status: ApplicationStatus = ApplicationStatus.PENDING_RESPONSE
 
 class ApplicationResponse(BaseModel):
+    app_id: int
     company_name: str
     job_title: str
     status: ApplicationStatus
     app_date: datetime
+
+class ApplicationEdit(BaseModel):
+    company_name: Optional[str] = None
+    job_title: Optional[str] = None
+    status: Optional[ApplicationStatus] = None
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
@@ -101,7 +107,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 async def get_user_applications(email: str):
     try:
         response = supabase.table('applications')\
-            .select("company_name,job_title,status,app_date")\
+            .select("app_id,company_name,job_title,status,app_date")\
             .eq("email", email)\
             .order("app_date", desc=True)\
             .execute()
@@ -171,6 +177,35 @@ async def update_application_status(app_id: int, status_update: ApplicationStatu
             raise HTTPException(status_code=404, detail="Application not found")
 
         return response.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+#edit an application's company/title/status (manual correction from the UI)
+@app.patch("/applications/{app_id}")
+async def edit_application(app_id: int, edit: ApplicationEdit):
+    update_data = {}
+    if edit.company_name is not None:
+        update_data["company_name"] = edit.company_name
+    if edit.job_title is not None:
+        update_data["job_title"] = edit.job_title
+    if edit.status is not None:
+        update_data["status"] = edit.status.value
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    try:
+        response = supabase.table('applications')\
+            .update(update_data)\
+            .eq("app_id", app_id)\
+            .execute()
+
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Application not found")
+
+        return response.data[0]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
