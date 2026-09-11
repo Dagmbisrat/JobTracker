@@ -1,5 +1,6 @@
 import React from "react";
 import { Github, Linkedin } from "lucide-react";
+import Settings from "../Settings/Settings.jsx";
 import "./Footer.css";
 
 const Footer = () => {
@@ -10,6 +11,7 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-copyright">© {currentYear} JobTracker</div>
         <div className="footer-social">
+          <Settings variant="ghost" />
           <a
             href="https://github.com/Dagmbisrat"
             target="_blank"

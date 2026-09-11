@@ -139,3 +139,60 @@
     --live-on: #22d3a5;
     --live-off: #ff6f9c;
 }
+
+/* ============================================================
+   Theme variant: "Carbon" — pure-black dark, neutral grays.
+   Selected via <html data-theme="carbon"> (Settings dialog).
+   Only overrides the dark tokens; light stays the same.
+   The default "Slate" variant needs no attribute.
+   ============================================================ */
+
+.dark[data-theme="carbon"] {
+    --background: #000000;
+    --background-alt: #0a0a0a;
+    --card-bg: #0a0a0a;
+    --surface-2: #111111;
+    --hover-bg: #1a1a1a;
+
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1a1;
+    --text-muted: #737373;
+
+    --border-color: #1f1f1f;
+    --border-strong: #2e2e2e;
+
+    --accent: #3291ff;
+    --accent-hover: #52a8ff;
+    --accent-soft: #0c1d33;
+    --focus-ring: rgba(50, 145, 255, 0.32);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.7);
+
+    --status-pending-bg: #2b2000;
+    --status-pending-fg: #f5d180;
+
+    --status-interview-bg: #06243f;
+    --status-interview-fg: #99c8ff;
+    --status-interview-dot: #3291ff;
+
+    --status-talk-bg: #1e1633;
+    --status-talk-fg: #cbb8ff;
+    --status-talk-dot: #a986ff;
+
+    --status-offer-bg: #06331f;
+    --status-offer-fg: #7ee0a8;
+    --status-offer-dot: #17c964;
+
+    --status-rejected-bg: #300f0f;
+    --status-rejected-fg: #ff9d97;
+    --status-rejected-dot: #ff5c55;
+
+    --error-bg: #2a1210;
+    --error-border: #6b1c18;
+    --error-text: #ff6166;
+
+    --live-on: #17c964;
+    --live-off: #ff5c55;
+}
