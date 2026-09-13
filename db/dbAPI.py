@@ -25,6 +25,13 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 FRONTEND_URL = os.getenv('FRONTEND_URL')
+# Vercel preview deployments (one per branch/PR) for this project only —
+# https://job-tracker-<hash-or-git-branch>-dagm-bisrats-projects.vercel.app.
+# Optional; override via env if the Vercel org/account slug ever changes.
+PREVIEW_ORIGIN_REGEX = os.getenv(
+    'PREVIEW_ORIGIN_REGEX',
+    r'^https://job-tracker-[a-z0-9-]+-dagm-bisrats-projects\.vercel\.app$',
+)
 
 #env validation
 if not all([SUPABASE_URL, SUPABASE_KEY, JWT_SECRET_KEY, FRONTEND_URL]):
@@ -40,6 +47,7 @@ app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[FRONTEND_URL],
+    allow_origin_regex=PREVIEW_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
