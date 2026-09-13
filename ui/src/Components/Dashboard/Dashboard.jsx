@@ -10,11 +10,13 @@ import {
   CalendarClock,
   Trophy,
   XCircle,
+  Pencil,
 } from "lucide-react";
 import "./Dashboard.css";
 import Footer from "../Footer/Footer.jsx";
 import StatusIndicator from "../StatusIndicator/StatusIndicator.jsx";
 import DarkModeToggle from "../LightDarkmodeButton/LightDarkmodeButton.jsx";
+import EditApplicationModal from "../EditApplicationModal/EditApplicationModal.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -26,6 +28,10 @@ const Dashboard = () => {
     key: "app_date",
     direction: "desc",
   });
+  const [editingApp, setEditingApp] = useState(null);
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user") || "null"),
+  );
 
   const statusOptions = [
     "All",
@@ -186,6 +192,16 @@ const Dashboard = () => {
     },
   ];
 
+  const handleApplicationSaved = (updatedFields) => {
+    const editedId = editingApp?.app_id;
+    setApplications((prev) =>
+      prev.map((app) =>
+        app.app_id === editedId ? { ...app, ...updatedFields } : app,
+      ),
+    );
+    setEditingApp(null);
+  };
+
   const getStatusClassName = (status) => {
     return `status-badge status-${status.toLowerCase().replace(/ /g, "-")}`;
   };
@@ -200,10 +216,13 @@ const Dashboard = () => {
     );
   };
 
-  const user =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
-      : null;
+  const handleListeningChange = (listening) => {
+    setUser((prev) => {
+      const updated = { ...prev, listening };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   return (
     <div className="dashboard-container">
@@ -214,7 +233,10 @@ const Dashboard = () => {
             <span className="app-wordmark">JobTracker</span>
           </div>
           <div className="app-bar-actions">
-            <StatusIndicator isListening={user ? user.listening : false} />
+            <StatusIndicator
+              isListening={user ? user.listening : false}
+              onChange={handleListeningChange}
+            />
             <DarkModeToggle
               isDark={isDark}
               toggleDark={toggleDark}
@@ -307,6 +329,7 @@ const Dashboard = () => {
                   >
                     <span>Date Applied {getSortIndicator("app_date")}</span>
                   </th>
+                  <th className="col-actions" />
                 </tr>
               </thead>
               <tbody>
@@ -328,11 +351,12 @@ const Dashboard = () => {
                       <td data-label="Date Applied">
                         <span className="skeleton" style={{ width: "4.5rem" }} />
                       </td>
+                      <td className="col-actions" />
                     </tr>
                   ))
                 ) : filteredAndSortedApplications.length === 0 ? (
                   <tr>
-                    <td colSpan="4">
+                    <td colSpan="5">
                       <div className="empty-state">
                         <Inbox size={28} />
                         <p className="empty-title">No applications found</p>
@@ -345,8 +369,8 @@ const Dashboard = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredAndSortedApplications.map((app, index) => (
-                    <tr key={index}>
+                  filteredAndSortedApplications.map((app) => (
+                    <tr key={app.app_id}>
                       <td data-label="Company" className="cell-company">
                         {app.company_name}
                       </td>
@@ -360,6 +384,16 @@ const Dashboard = () => {
                       <td data-label="Date Applied" className="cell-date">
                         {formatDate(app.app_date)}
                       </td>
+                      <td className="col-actions">
+                        <button
+                          type="button"
+                          className="row-edit-button"
+                          onClick={() => setEditingApp(app)}
+                          aria-label={`Edit ${app.company_name}`}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -370,6 +404,12 @@ const Dashboard = () => {
       </main>
 
       <Footer />
+
+      <EditApplicationModal
+        application={editingApp}
+        onClose={() => setEditingApp(null)}
+        onSaved={handleApplicationSaved}
+      />
     </div>
   );
 };
