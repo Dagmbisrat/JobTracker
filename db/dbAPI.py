@@ -244,6 +244,9 @@ class LoginResponse(BaseModel):
     token_type: str
     user: UserResponse
 
+class ListeningUpdate(BaseModel):
+    listening: bool
+
 #Hash Pass
 def hash_password(password: str) -> str:
     # Generate a salt and hash the password
@@ -410,6 +413,33 @@ async def get_user(request: Request, user_login: UserLogin):
         raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+#toggle whether the logged-in user's inbox is being tracked
+@app.patch("/users/listening", response_model=UserResponse)
+async def update_listening(
+    update: ListeningUpdate,
+    credentials: HTTPAuthorizationCredentials = Security(security),
+):
+    email = await get_current_user(credentials)
+    try:
+        response = supabase.table('users')\
+            .update({"Listening": update.listening})\
+            .eq("email", email)\
+            .execute()
+
+        if not response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user = response.data[0]
+        return UserResponse(
+            name=user['Name'],
+            email=user['email'],
+            listening=user['Listening'],
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 #----------------------Others-------------------------
 

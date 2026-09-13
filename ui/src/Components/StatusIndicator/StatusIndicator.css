@@ -6,6 +6,13 @@
     border-radius: var(--radius-full);
     background: var(--surface-2);
     border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.status-indicator-container:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-strong);
 }
 
 .status-dot {
@@ -63,5 +70,137 @@
 
     .status-indicator-container {
         padding: 0.35rem;
+    }
+}
+
+/* ---------- confirmation dialog ---------- */
+.tracking-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgba(9, 11, 17, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1000;
+    animation: tracking-fade 0.16s ease;
+}
+
+.tracking-panel {
+    width: 380px;
+    max-width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 1.5rem;
+    animation: tracking-rise 0.22s ease;
+}
+
+.tracking-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.tracking-desc {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.tracking-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+    font-size: 0.82rem;
+}
+
+.tracking-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+}
+
+.tracking-cancel,
+.tracking-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background var(--transition), opacity var(--transition),
+        transform var(--transition);
+}
+
+.tracking-cancel {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.tracking-cancel:hover:not(:disabled) {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.tracking-confirm {
+    background: var(--btn);
+    color: var(--btn-fg);
+    border: 1px solid transparent;
+    min-width: 6.5rem;
+}
+
+.tracking-confirm:hover:not(:disabled) {
+    background: var(--btn-hover);
+    transform: translateY(-1px);
+}
+
+.tracking-cancel:disabled,
+.tracking-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tracking-spin {
+    animation: tracking-spin 1s linear infinite;
+}
+
+@keyframes tracking-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes tracking-rise {
+    from {
+        transform: translateY(14px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes tracking-spin {
+    to {
+        transform: rotate(360deg);
     }
 }

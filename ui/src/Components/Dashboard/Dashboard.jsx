@@ -29,6 +29,9 @@ const Dashboard = () => {
     direction: "desc",
   });
   const [editingApp, setEditingApp] = useState(null);
+  const [user, setUser] = useState(() =>
+    JSON.parse(localStorage.getItem("user") || "null"),
+  );
 
   const statusOptions = [
     "All",
@@ -213,10 +216,13 @@ const Dashboard = () => {
     );
   };
 
-  const user =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
-      : null;
+  const handleListeningChange = (listening) => {
+    setUser((prev) => {
+      const updated = { ...prev, listening };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   return (
     <div className="dashboard-container">
@@ -227,7 +233,10 @@ const Dashboard = () => {
             <span className="app-wordmark">JobTracker</span>
           </div>
           <div className="app-bar-actions">
-            <StatusIndicator isListening={user ? user.listening : false} />
+            <StatusIndicator
+              isListening={user ? user.listening : false}
+              onChange={handleListeningChange}
+            />
             <DarkModeToggle
               isDark={isDark}
               toggleDark={toggleDark}
