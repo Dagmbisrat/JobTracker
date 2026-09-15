@@ -106,11 +106,50 @@
     display: flex;
     align-items: center;
     gap: 0.85rem;
+    width: 100%;
     padding: 1rem 1.1rem;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.stat-card:hover {
+    border-color: var(--text-secondary);
+    box-shadow: var(--shadow-md, var(--shadow-sm));
+}
+
+.stat-card:focus-visible {
+    outline: 2px solid var(--status-interview-fg);
+    outline-offset: 2px;
+}
+
+.stat-card:active {
+    transform: scale(0.98);
+}
+
+.stat-card.is-active {
+    border-color: var(--text-secondary);
+    background: var(--surface-2);
+}
+
+.tone-interview.is-active {
+    border-color: var(--status-interview-fg);
+    background: var(--status-interview-bg);
+}
+
+.tone-offer.is-active {
+    border-color: var(--status-offer-fg);
+    background: var(--status-offer-bg);
+}
+
+.tone-rejected.is-active {
+    border-color: var(--status-rejected-fg);
+    background: var(--status-rejected-bg);
 }
 
 .stat-icon {
