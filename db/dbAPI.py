@@ -153,10 +153,18 @@ async def get_application_id(email: str, company_name: str, job_title: str):
 @app.post("/applications")
 async def create_application(application: Application):
     try:
+        # Defense-in-depth: normalize a blank company_name/job_title to "Unknown"
+        # rather than persisting an empty string. The upstream email-classifier
+        # pipeline already guards against this, but by the time an application
+        # reaches this endpoint the source email has typically been marked as
+        # read, so rejecting the request outright would silently lose it.
+        job_title = application.job_title.strip() or "Unknown"
+        company_name = application.company_name.strip() or "Unknown"
+
         response = supabase.table('applications').insert({
             "email": application.email,
-            "company_name": application.company_name,
-            "job_title": application.job_title,
+            "company_name": company_name,
+            "job_title": job_title,
             "status": application.status
         }).execute()
 
