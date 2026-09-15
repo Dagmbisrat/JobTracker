@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { DB_API_ADDY } from "../Config.js";
 import {
@@ -29,6 +29,7 @@ const Dashboard = () => {
     direction: "desc",
   });
   const [editingApp, setEditingApp] = useState(null);
+  const panelRef = useRef(null);
   const [user, setUser] = useState(() =>
     JSON.parse(localStorage.getItem("user") || "null"),
   );
@@ -171,24 +172,28 @@ const Dashboard = () => {
       value: applications.length,
       icon: Briefcase,
       tone: "neutral",
+      filterValue: "All",
     },
     {
       label: "Interviews",
       value: countByStatus("Interview Scheduled"),
       icon: CalendarClock,
       tone: "interview",
+      filterValue: "Interview Scheduled",
     },
     {
       label: "Offers",
       value: countByStatus("Offer Received"),
       icon: Trophy,
       tone: "offer",
+      filterValue: "Offer Received",
     },
     {
       label: "Rejected",
       value: countByStatus("Rejected"),
       icon: XCircle,
       tone: "rejected",
+      filterValue: "Rejected",
     },
   ];
 
@@ -260,7 +265,21 @@ const Dashboard = () => {
 
         <div className="stat-grid">
           {stats.map((s) => (
-            <div key={s.label} className={`stat-card tone-${s.tone}`}>
+            <button
+              key={s.label}
+              type="button"
+              className={`stat-card tone-${s.tone} ${
+                selectedStatus === s.filterValue ? "is-active" : ""
+              }`}
+              aria-pressed={selectedStatus === s.filterValue}
+              onClick={() => {
+                setSelectedStatus(s.filterValue);
+                panelRef.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+            >
               <div className="stat-icon">
                 <s.icon size={18} />
               </div>
@@ -268,11 +287,11 @@ const Dashboard = () => {
                 <span className="stat-value">{loading ? "—" : s.value}</span>
                 <span className="stat-label">{s.label}</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
 
-        <div className="panel">
+        <div className="panel" ref={panelRef}>
           <div className="toolbar">
             <div className="search-field">
               <Search size={16} className="search-icon" />
