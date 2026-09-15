@@ -8,6 +8,7 @@ from datetime import date
 from dotenv import load_dotenv
 from email.header import decode_header
 from Requests import classify_email, prosses_Email
+from email_utils import get_email_content
 
 load_dotenv()
 # Get environment variables prosses_Email
@@ -38,26 +39,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-def get_email_content(msg):
-    """Extract the email content from the message"""
-    content = ""
-    if msg.is_multipart():
-        # Walk through the parts to find the text content
-        for part in msg.walk():
-            if part.get_content_type() == "text/plain":
-                try:
-                    content += part.get_payload(decode=True).decode()
-                except Exception as e:
-                    logger.error(f"Error decoding email part: {str(e)}")
-    else:
-        # If the message is not multipart, just get the payload
-        try:
-            content = msg.get_payload(decode=True).decode()
-        except Exception as e:
-            logger.error(f"Error decoding email: {str(e)}")
-            content = msg.get_payload()
-    return content
 
 def connect_to_email(email_address, password, imap_server="imap.gmail.com"):
     """Connect to email server and return IMAP connection object"""

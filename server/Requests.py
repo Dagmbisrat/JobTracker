@@ -1,11 +1,14 @@
 import os
+import logging
 import requests
 from openai import OpenAI
 from textwrap import dedent
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # Get environment variables
 API_KEY = os.getenv('API_KEY')
@@ -20,31 +23,52 @@ client = OpenAI(api_key=API_KEY)
 
 # Prompt
 summarization_prompt = '''
-You will be provided with an email sent to a person.
-Your goal will be to check if the email is an automated confirmation of the receipt's application,
-or if it is a rejection/acceptance of a job application.
+You will be given the raw contents of an email (From, Subject, and Content) sent to a job
+seeker. Determine whether it relates to a job application, and if so, classify it and extract
+its details.
 
-Here is a description of the parameters:
+For every case where you must extract `company_name` and `job_title`, follow this priority
+order:
+1. Look for an explicit statement in the email body (e.g. "your application for the Software
+   Engineer role at Acme Corp").
+2. If not stated plainly in the body, check the Subject line — job title and company name are
+   very often only present there (e.g. "Application received: Backend Engineer, Acme Corp").
+3. If not in the Subject, check the sender's name/domain in the From address for the company
+   name (e.g. "careers@acme.com" -> "Acme").
+4. Only if the job title truly cannot be determined from body, subject, or sender after checking
+   all of the above, set `job_title` to the literal string "Unknown". Never return an empty
+   string, and never guess a title that isn't supported by the email.
+5. Only if the company name truly cannot be determined, set `company_name` to "Unknown" as well.
 
-1. **Automated confirmation of receipt job application**:
+Classify the email into exactly one of these three cases:
+
+1. **Automated confirmation of receipt of a job application** (e.g. "we received your
+   application", "thanks for applying"):
    - `type`: 1
-   - `company_name`: The name of the company mentioned in the email.
-   - `job_title`: The title of the job applied for.
+   - `company_name`: extracted per the priority order above.
+   - `job_title`: extracted per the priority order above.
    - `status`: "Pending Response"
 
-2. **Rejection or acceptance of a job application(including potential follow-up communication)**:
+2. **A rejection, acceptance, interview/talk scheduling, or offer — including any follow-up
+   communication about a job application already in progress**:
    - `type`: 2
-   - `company_name`: The name of the company the email is from (no always from the email address its from).
-   - `job_title`: The title of the job applied for (make shure this exsists).
-   - `status`: "Pending Response" or "Rejected" or "Interview Scheduled" or "Talk Scheduled" or "Offer Received" based on the email's content.
-   - `date`: Today's date in the format DD/MM/YYYY.
+   - `company_name`: extracted per the priority order above.
+   - `job_title`: extracted per the priority order above.
+   - `status`: one of "Pending Response", "Rejected", "Interview Scheduled", "Talk Scheduled",
+     "Offer Received", based on the email's content.
+   - `date`: today's date in the format DD/MM/YYYY.
 
-3. **Neither of the above**:
+3. **Not related to a job application** (newsletters, marketing, unrelated personal/business
+   email, etc.):
    - `type`: 0
    - `company_name`: "-"
    - `job_title`: "-"
    - `status`: "-"
    - `date`: "-"
+
+Important: "Unknown" (case 1 and 2, when extraction genuinely fails) and "-" (case 3, not
+job-related at all) mean different things — never mix them up, and never emit an empty string
+for `company_name` or `job_title`.
 '''
 
 class Email_Classifcation(BaseModel):
@@ -54,8 +78,17 @@ class Email_Classifcation(BaseModel):
     status: str
     date: str
 
+    @field_validator("company_name", "job_title", mode="after")
+    @classmethod
+    def _blank_to_unknown(cls, v: str) -> str:
+        """Backstop for a model response that still comes back blank despite the
+        prompt's instructions — normalize whitespace/empty strings to "Unknown"
+        rather than let them flow silently into the db."""
+        v = v.strip()
+        return v if v else "Unknown"
+
 # Function to classify the email
-def classify_email(text: str):
+def classify_email(text: str, _retry: bool = True):
     completion = client.beta.chat.completions.parse(
         model=MODEL,
         temperature=0.2,
@@ -66,7 +99,18 @@ def classify_email(text: str):
         response_format=Email_Classifcation,
     )
 
-    return completion.choices[0].message.parsed
+    result = completion.choices[0].message.parsed
+
+    is_job_related = result.type in (1, 2)
+    is_incomplete = result.company_name == "Unknown" or result.job_title == "Unknown"
+
+    if is_job_related and is_incomplete:
+        if _retry:
+            logger.warning(f"Blank/Unknown field on first pass, retrying once. Raw result: {result}")
+            return classify_email(text, _retry=False)
+        logger.warning(f"Still Unknown after retry, proceeding anyway. Raw result: {result}")
+
+    return result
 
 #function to process email
 def prosses_Email(email_classification: Email_Classifcation, email: str):
