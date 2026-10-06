@@ -90,6 +90,10 @@ def check_for_new_emails(imap,email_address):
                 answer = classify_email(email_)
                 prosses_Email(answer,email_address)
 
+                # Fetching marks the email read; put non-job emails back to unread
+                if answer.type not in (1, 2):
+                    imap.store(num, "-FLAGS", "\\Seen")
+
             except Exception as e:
                 logger.error(f"Error processing email {num}: {str(e)}")
                 continue
