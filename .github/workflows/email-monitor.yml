@@ -1,7 +1,7 @@
 name: Email Monitor
 on:
   schedule:
-    - cron: "0 13 * * 1" # Runs weekly, Mondays 13:00 UTC
+    - cron: "17 */3 * * *" # Runs every 3 hours
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -21,8 +21,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Compute email cutoff (7 days ago)
-        run: echo "EMAIL_SINCE=$(LC_ALL=C date -u -d '7 days ago' +%d-%b-%Y)" >> "$GITHUB_ENV"
+      - name: Compute email cutoff (2 days ago)
+        run: echo "EMAIL_SINCE=$(LC_ALL=C date -u -d '2 days ago' +%d-%b-%Y)" >> "$GITHUB_ENV"
 
       - name: Run email monitor
         env:
